@@ -45,24 +45,32 @@ void read(struct adjlog *l) {
 	
 	LOG("space for time:\t%.2lf MBytes (%lu bytes)", (double)(l->size_time/W+1)*sizeof(uint)/1024/1024, l->size_time/W*sizeof(uint));
 	
-	l->time = (uint *) malloc((l->size_time/W + 1) * sizeof(uint));
+	l->time = (uint *) calloc((l->size_time/W + 1), sizeof(uint));
 	l->log = (u_long *) malloc(l->size_log * sizeof(u_long));
 	
 //	printf("int1: %X\n", in1((uint)1, (uint)1));
 	
-	
+	uint bitpos=0;
+	uint i;
 	t = 0;
 	u_long *p;
 	p = l->log;
 	while(EOF != scanf("%u %u %u %u", &a[0], &a[1], &a[2], &a[3])) {
 		*p++ = in1(a[0], a[1]);
-		if (t != a[3]) {
+		if (t != a[2]) {
 			//put time mark
-			
+			for( i = t; i < a[2]; i++) {
+				printf("setting in pos %u\n", bitpos);
+				bitset(l->time, bitpos);
+				bitpos++;
+			}
 		}
 		
-		t = a[3];
+		t = a[2];
+		bitpos++;
 	}
+	bitset(l->time, bitpos);
+	
 }
 
 
@@ -91,7 +99,7 @@ int main(int argc, char *argv[]) {
 	create_index(tgl, &tg);
 	LOG("Size of index: %lu\n", tgl.getSize());
 	
-	LOG("Depth: %lu", tgl.get_log()->getDepth());
+	LOG("Depth: %u", tgl.get_log()->getDepth());
 	
 	ofstream file;
 	file.open(argv[2], ios::binary);

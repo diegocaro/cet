@@ -22,7 +22,9 @@ public:
 	WaveletTree *get_log() {return this->log;};
 
 	uint get_changes() {return this->changes;}
-	size_t getSize() { return this->log->getSize() + this->time->getSize();}
+	size_t getSize() { return this->log->getSize() + this->time->getSize() + sizeof(TemporalGraphLog);}
+	size_t pos_time(size_t i) const;
+	
 protected:
         uint nodes;
         uint changes;
@@ -31,6 +33,11 @@ protected:
         BitSequence *time;
         uint size_log;
         uint size_time;
+		
+		
+		
+		
+		
 };
 
 #endif

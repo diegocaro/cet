@@ -79,6 +79,14 @@ int main(int argc, char *argv[]) {
 	printf("depth: %u\n", wt->getDepth());
 	assert(tgl->get_changes() == tg.changes);
 	// 
+	
+	
+	printf("position of time 0: %lu\n", tgl->pos_time(0));
+	printf("position of time 1: %lu\n", tgl->pos_time(1));
+	printf("position of time 5: %lu\n", tgl->pos_time(5));
+	printf("position of time 7: %lu\n", tgl->pos_time(7));
+		printf("position of time 19: %lu\n", tgl->pos_time(19));
+		printf("position of time 20: %lu\n", tgl->pos_time(20));
 	 for( uint i = 0; i < tg.changes; i++) {
 		  	assert(wt->access(i) == tg.log[i]);
 			 }
@@ -87,7 +95,7 @@ int main(int argc, char *argv[]) {
 	uint start, end;
 	uint i;
 	start = 0;
-	end = 10;
+	end = tgl->pos_time(0);
 	
 	uint x,y;
 	u_long z;
@@ -96,6 +104,7 @@ int main(int argc, char *argv[]) {
 		de1(z, &x, &y);
 		printf("%lu: %u -> %u\n", z, x, y);
 	}
+
 
 	printf("range report\n");	
 	vector<u_long> aa;
@@ -109,7 +118,7 @@ int main(int argc, char *argv[]) {
 	
 	printf("axis report\n");
 	vector<u_long> bb;
-	wt->range_axis_report(start, end, 0, 0UL, bb);
+	wt->range_axis_report(start, end, 1, 0UL, bb);
 	for(i = 0; i < bb.size(); i+=2) {
 		de1(bb[i], &x, &y);
 		printf("%lu (%u,%u): %lu\n",bb[i],x,y,bb[i+1]);

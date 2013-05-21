@@ -41,3 +41,17 @@ TemporalGraphLog* TemporalGraphLog::load(ifstream &fp) {
 	ret->time = BitSequence::load(fp);
 	return ret;
 }
+
+ size_t TemporalGraphLog::pos_time(size_t i) const {
+//	return b->select1(i+1) - i; 	//in the paper this operation is
+                                  //start(i) = select1(b, i) - i + 1
+
+  uint ret = time->select1(i+1);
+  printf("ret: %u\n", ret);
+  if (ret == (uint)(-1)) {
+    return time->getLength() - i;
+  }
+  else {
+    return ret - i;
+  }
+}
