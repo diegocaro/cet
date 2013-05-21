@@ -1,4 +1,5 @@
 #include "tgl.h"
+#include "interleave.h"
 
 TemporalGraphLog::TemporalGraphLog() {};
 
@@ -42,7 +43,7 @@ TemporalGraphLog* TemporalGraphLog::load(ifstream &fp) {
 	return ret;
 }
 
- size_t TemporalGraphLog::pos_time(size_t i) const {
+size_t TemporalGraphLog::pos_time(size_t i) const {
 //	return b->select1(i+1) - i; 	//in the paper this operation is
                                   //start(i) = select1(b, i) - i + 1
 
@@ -55,3 +56,25 @@ TemporalGraphLog* TemporalGraphLog::load(ifstream &fp) {
     return ret - i;
   }
 }
+
+void TemporalGraphLog::direct_point(uint node, uint t, vector<u_long> &ans) const {
+	size_t ptime;
+	ptime = pos_time(t);
+	u_long z;
+	
+	z = in1(node, 0);
+	
+	log->range_axis_report(0U, ptime, 0U, z, ans);
+}
+
+void TemporalGraphLog::reverse_point(uint node, uint t, vector<u_long> &ans) const {
+	size_t ptime;
+	ptime = pos_time(t);
+	u_long z;
+	
+	z = in1(0, node);
+//	wt->range_axis_report(start, end, 1, 0UL, bb);
+	log->range_axis_report(0U, ptime, 1U, z, ans);
+}
+
+

@@ -125,5 +125,22 @@ int main(int argc, char *argv[]) {
 	}
 	
 	
+	printf("directo neighbors\n");
+	bb.clear();
+	tgl->direct_point(0, 10, bb);
+	for(i = 0; i < bb.size(); i+=2) {
+		de1(bb[i], &x, &y);
+		printf("%lu (%u,%u): %lu\n",bb[i],x,y,bb[i+1]);
+	}
+	
+	
+	printf("reversp neighbors\n");
+	bb.clear();
+	tgl->reverse_point(0, 10, bb);
+	for(i = 0; i < bb.size(); i+=2) {
+		de1(bb[i], &x, &y);
+		printf("%lu (%u,%u): %lu\n",bb[i],x,y,bb[i+1]);
+	}
+	
 	return 0;
 }

@@ -25,6 +25,10 @@ public:
 	size_t getSize() { return this->log->getSize() + this->time->getSize() + sizeof(TemporalGraphLog);}
 	size_t pos_time(size_t i) const;
 	
+	void direct_point(uint node, uint t, vector<u_long> &ans) const;
+	void reverse_point(uint node, uint t, vector<u_long> &ans) const;
+	
+	
 protected:
         uint nodes;
         uint changes;
