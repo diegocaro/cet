@@ -60,7 +60,7 @@ void read(struct adjlog *l) {
 		if (t != a[2]) {
 			//put time mark
 			for( i = t; i < a[2]; i++) {
-				printf("setting in pos %u\n", bitpos);
+				//printf("setting in pos %u\n", bitpos);
 				bitset(l->time, bitpos);
 				bitpos++;
 			}
@@ -75,7 +75,7 @@ void read(struct adjlog *l) {
 
 
 void create_index(TemporalGraphLog &tgl, struct adjlog *adjlog) {
-    tgl.set_nodes(adjlog->nodes);
+	tgl.set_nodes(adjlog->nodes);
 	tgl.set_changes(adjlog->changes);
 	tgl.set_maxtime(adjlog->maxtime);
 	tgl.set_log(adjlog->log, adjlog->size_log);
