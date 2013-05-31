@@ -9,7 +9,7 @@ struct adjlog {
         uint maxtime; //maximum time in the dataset from [0 ... maxtime-1]
 
         uint size_log; //size of the log
-        u_long *log; //including time and edges
+        usym *log; //including time and edges
 
         uint *time; // bitmap of time in nodes
         uint size_time;
@@ -36,23 +36,36 @@ void read(struct adjlog *l) {
 	LOG("space for time:\t%.2lf MBytes (%lu bytes)", (double)(l->size_time/W+1)*sizeof(uint)/1024/1024, l->size_time/W*sizeof(uint));
 	
 	l->time = (uint *) malloc((l->size_time/W + 1) * sizeof(uint));
-	l->log = (u_long *) malloc(l->size_log * sizeof(u_long));
+	l->log = (usym *) malloc(l->size_log * sizeof(usym));
+  
 	
-//	printf("int1: %X\n", in1((uint)1, (uint)1));
-	
-	
+	uint bitpos=0;
+	uint i;
 	t = 0;
-	u_long *p;
-	p = l->log;
+  
+	//u_long *p;
+	//p = l->log;
+  uint k=0;
 	while(EOF != scanf("%u %u %u %u", &a[0], &a[1], &a[2], &a[3])) {
-		*p++ = in1(a[0], a[1]);
-		if (t != a[3]) {
+		//*p++ = in1(a[0], a[1]);
+    l->log[k].s[0] = a[0];
+    l->log[k].s[1] = a[1];    
+    k++;
+    
+		if (t != a[2]) {
 			//put time mark
-			
+			for( i = t; i < a[2]; i++) {
+				//printf("setting in pos %u\n", bitpos);
+				bitset(l->time, bitpos);
+				bitpos++;
+			}
 		}
 		
-		t = a[3];
+		t = a[2];
+		bitpos++;
 	}
+	bitset(l->time, bitpos);
+	
 }
 
 
@@ -96,15 +109,15 @@ int main(int argc, char *argv[]) {
 	uint i;
 	start = 0;
 	end = tgl->pos_time(0);
-	
+	/*
 	uint x,y;
-	u_long z;
+	usym z;
 	for(i = start; i < end; i++) {
 		z = wt->access(i);
 		de1(z, &x, &y);
 		printf("%lu: %u -> %u\n", z, x, y);
 	}
-
+  
 
 	printf("range report\n");	
 	vector<u_long> aa;
@@ -141,6 +154,6 @@ int main(int argc, char *argv[]) {
 		de1(bb[i], &x, &y);
 		printf("%lu (%u,%u): %lu\n",bb[i],x,y,bb[i+1]);
 	}
-	
+*/	
 	return 0;
 }
