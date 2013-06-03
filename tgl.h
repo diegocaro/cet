@@ -2,7 +2,9 @@
 #define TGL_H_
 
 #include <BitSequence.h>
-#include "wavelet_tree.h"
+#include "wavelet_kd_matrix.h"
+
+#define BUFFER 1024*1024
 
 class TemporalGraphLog {
 public:
@@ -19,21 +21,21 @@ public:
 	void save(ofstream &fp);
 	static TemporalGraphLog* load(ifstream &fp);
 	
-	WaveletTree *get_log() {return this->log;};
+	WaveletKdMatrix *get_log() {return this->log;};
 
 	uint get_changes() {return this->changes;}
-	size_t getSize() { return this->log->getSize() + this->time->getSize() + sizeof(TemporalGraphLog);}
+	size_t getSize() { /*return this->log->getSize() + this->time->getSize() + sizeof(TemporalGraphLog);*/ return 0;}
 	size_t pos_time(size_t i) const;
 	
-	void direct_point(uint node, uint t, vector<uint> &ans) const;
-	void reverse_point(uint node, uint t, vector<uint> &ans) const;
+	void direct_point(uint node, uint t, uint *res) const;
+	void reverse_point(uint node, uint t, uint *res) const;
 	
 	
 protected:
         uint nodes;
         uint changes;
         uint maxtime;
-        WaveletTree *log;
+        WaveletKdMatrix *log;
         BitSequence *time;
         uint size_log;
         uint size_time;

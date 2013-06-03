@@ -58,8 +58,8 @@ void read(struct adjlog *l) {
   uint k=0;
 	while(EOF != scanf("%u %u %u %u", &a[0], &a[1], &a[2], &a[3])) {
 		//*p++ = in1(a[0], a[1]);
-    l->log[k].s[0] = a[0];
-    l->log[k].s[1] = a[1];    
+    l->log[k].x = a[0];
+    l->log[k].y = a[1];    
     k++;
     
 		if (t != a[2]) {
@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
 	create_index(tgl, &tg);
 	LOG("Size of index: %lu\n", tgl.getSize());
 	
-	LOG("Depth: %u", tgl.get_log()->getDepth());
+	//LOG("Depth: %u", tgl.get_log()->getDepth());
 	
 	ofstream file;
 	file.open(argv[2], ios::binary);

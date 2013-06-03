@@ -1,7 +1,7 @@
 #include <sys/types.h>
 #include "tgl.h"
 #include "debug.h"
-#include "interleave.h"
+//#include "interleave.h"
 
 struct adjlog {
         uint nodes; //number of nodes from [0 ... nodes -1]
@@ -48,8 +48,8 @@ void read(struct adjlog *l) {
   uint k=0;
 	while(EOF != scanf("%u %u %u %u", &a[0], &a[1], &a[2], &a[3])) {
 		//*p++ = in1(a[0], a[1]);
-    l->log[k].s[0] = a[0];
-    l->log[k].s[1] = a[1];    
+    l->log[k].x = a[0];
+    l->log[k].y = a[1];    
     k++;
     
 		if (t != a[2]) {
@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
 	TemporalGraphLog *tgl;
 	struct adjlog tg;
 	
-	WaveletTree *wt;
+	WaveletKdMatrix *wt;
 	
 	INFO("Loading input graph...");
 	read(&tg);
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
 	
 	printf("input changes: %u\n", tg.changes);
 	printf("tgl changes: %u\n", tgl->get_changes());
-	printf("depth: %u\n", wt->getDepth());
+	//printf("depth: %u\n", wt->getDepth());
 	assert(tgl->get_changes() == tg.changes);
 	// 
 	
@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
 	// 
 	
 	uint start, end;
-	uint i;
+	//uint i;
 	start = 0;
 	end = tgl->pos_time(0);
 	/*

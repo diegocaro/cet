@@ -1,12 +1,12 @@
 DEPEN_LIBCDS_INC=../libcds/includes/
 DEPEN_LIBCDS=../libcds/lib/libcds.a
 
-DEPEN_WT64=../wtkd/
-DEPEN_WT64_OBJS=wt_coder.o wt_node.o wt_node_leaf.o wavelet_tree.o wt_coder_binary.o wt_node_internal.o wt_coder_morton.o wt_coder_huff_morton.o symbols.o
+DEPEN_WT64=../wtkdmatrix/
+DEPEN_WT64_OBJS=wavelet_kd_matrix.o symbols.o
 
 CC=g++
 DEBUG = -g -DDEBUG
-CFLAGS=-c -Wall -I$(DEPEN_LIBCDS_INC) -I$(DEPEN_WT64) -O9
+CFLAGS=-c -Wall -I$(DEPEN_LIBCDS_INC) -I$(DEPEN_WT64) #-O9
 LDFLAGS=-Wall $(DEPEN_LIBCDS) -lm
 
 EXT=
@@ -16,10 +16,10 @@ OBJECTS=$(SOURCES:.cpp=.o)
 
 DEPENOBJS+=$(addprefix $(DEPEN_WT64), $(DEPEN_WT64_OBJS))
 
-MAINSRC=create.cpp use.cpp test.cpp
+MAINSRC=create.cpp use.cpp test.cpp benchmark.cpp
 MAINOBJ=$(MAINSRC:.cpp=.o)
 
-EXECUTABLE=create use test
+EXECUTABLE=create use test benchmark
 
 #all: CFLAGS += -O9
 all: $(SOURCES) $(MAINSRC) $(MAINOBJ) $(OBJECTS) $(EXECUTABLE) 
