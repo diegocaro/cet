@@ -28,10 +28,18 @@ public:
 	size_t pos_time(size_t i) const;
 	
 	void direct_point(uint node, uint t, uint *res) const;
-	void reverse_point(uint node, uint t, uint *res) const;
+	void direct_weak(uint node, uint tstart, uint tend, uint *res) const;
+	void direct_strong(uint node, uint tstart, uint tend, uint *res) const;	
 	
+	void reverse_point(uint node, uint t, uint *res) const;
+	void reverse_weak(uint node, uint tstart, uint tend, uint *res) const;
+	void reverse_strong(uint node, uint tstart, uint tend, uint *res) const;
 	
 protected:
+	
+	void direct_interval(uint node, uint tstart, uint tend, uint semantic, uint *res) const;
+	void reverse_interval(uint node, uint tstart, uint tend, uint semantic, uint *res) const;
+	
         uint nodes;
         uint changes;
         uint maxtime;

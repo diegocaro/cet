@@ -1,4 +1,6 @@
 #include "tgl.h"
+#include "arraysort.h"
+
 //#include "interleave.h"
 
 TemporalGraphLog::TemporalGraphLog() {};
@@ -83,6 +85,62 @@ void TemporalGraphLog::direct_point(uint node, uint t, uint *res) const {
 	*res = j;
 }
 
+void TemporalGraphLog::direct_interval(uint node, uint tstart, uint tend, uint semantic, uint *res) const {
+	uint *buffer;
+
+	buffer = new uint[BUFFER];
+	
+	
+	size_t sptime;
+	size_t eptime;
+	sptime = pos_time(tstart);
+	eptime = pos_time(tend);
+	
+	
+	vector<uint> rng;
+	log->axis(sptime, eptime, 0U, node, rng);
+
+	uint j;
+	uint i;
+	j = 0;
+	for (i = 0; i < rng.size(); i += 2) {
+		buffer[++j] = rng[i];
+	}
+	*buffer = j;
+	
+	*res = 0;
+	direct_point(node, tstart, res);
+	
+	if (semantic == 0) { //semantic weak
+		j = *res;
+		for (i = 1; i <= *buffer; i++) {
+			res[++j] = buffer[i];
+		}
+		*res = j;
+
+		qsort(&res[1], *res, sizeof(unsigned int), compare);
+
+		remove_duplicates(res);
+	}
+	else if (semantic == 1) { //semantic strong
+
+		//printf("direct neighbors: "); print_arraysort(buffer3);
+		diff_arraysort(res, buffer);
+	}
+	
+	
+	delete [] buffer;
+}
+
+void TemporalGraphLog::direct_weak(uint node, uint tstart, uint tend, uint *res) const {
+	direct_interval(node, tstart, tend, 0, res);
+}
+
+void TemporalGraphLog::direct_strong(uint node, uint tstart, uint tend, uint *res) const {
+	direct_interval(node, tstart, tend, 1, res);
+}
+
+
 void TemporalGraphLog::reverse_point(uint node, uint t, uint *res) const {
 	size_t ptime;
 	ptime = pos_time(t);
@@ -103,3 +161,57 @@ void TemporalGraphLog::reverse_point(uint node, uint t, uint *res) const {
 }
 
 
+void TemporalGraphLog::reverse_interval(uint node, uint tstart, uint tend, uint semantic, uint *res) const {
+	uint *buffer;
+
+	buffer = new uint[BUFFER];
+	
+	
+	size_t sptime;
+	size_t eptime;
+	sptime = pos_time(tstart);
+	eptime = pos_time(tend);
+	
+	
+	vector<uint> rng;
+	log->axis(sptime, eptime, 1U, node, rng);
+
+	uint j;
+	uint i;
+	j = 0;
+	for (i = 0; i < rng.size(); i += 2) {
+		buffer[++j] = rng[i];
+	}
+	*buffer = j;
+	
+	*res = 0;
+	reverse_point(node, tstart, res);
+	
+	if (semantic == 0) { //semantic weak
+		j = *res;
+		for (i = 1; i <= *buffer; i++) {
+			res[++j] = buffer[i];
+		}
+		*res = j;
+
+		qsort(&res[1], *res, sizeof(unsigned int), compare);
+
+		remove_duplicates(res);
+	}
+	else if (semantic == 1) { //semantic strong
+
+		//printf("direct neighbors: "); print_arraysort(buffer3);
+		diff_arraysort(res, buffer);
+	}
+	
+	
+	delete [] buffer;
+}
+
+void TemporalGraphLog::reverse_weak(uint node, uint tstart, uint tend, uint *res) const {
+	reverse_interval(node, tstart, tend, 0, res);
+}
+
+void TemporalGraphLog::reverse_strong(uint node, uint tstart, uint tend, uint *res) const {
+	reverse_interval(node, tstart, tend, 1, res);
+}
