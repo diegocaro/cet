@@ -27,6 +27,9 @@ public:
 	size_t getSize() { /*return this->log->getSize() + this->time->getSize() + sizeof(TemporalGraphLog);*/ return 0;}
 	size_t pos_time(size_t i) const;
 	
+	uint getMaxtime() { return maxtime;}
+	
+	
 	void direct_point(uint node, uint t, uint *res) const;
 	void direct_weak(uint node, uint tstart, uint tend, uint *res) const;
 	void direct_strong(uint node, uint tstart, uint tend, uint *res) const;	

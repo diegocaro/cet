@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
 	ifstream f;
 	uint *buffer;
 	uint i, j;
-	uint a,b;
+	
 
 	buffer = (uint *)malloc(sizeof(uint)*BUFFER);
 
@@ -25,6 +25,7 @@ int main(int argc, char *argv[]) {
 	index = TemporalGraphLog::load(f);
 	f.close();
 /*
+	uint a,b;
 	printf("Write your query: ");
 	while(scanf("%u %u", &a, &b)) {
 		get_neighbors_point(buffer, &index, a, b);
@@ -38,7 +39,7 @@ int main(int argc, char *argv[]) {
 	for ( i = 0; i < 5; i++) {
 		//printf("start(%u): %u\n", i, start(index.map, i));
 		printf("Direct of node %u\n", i);
-		for( j = 0; j <= 5; j++) {
+		for( j = 0; j <= index->getMaxtime(); j++) {
 			index->direct_point(i, j, buffer);
 			printf("t=%u -> ", j);print_arraysort(buffer);
 			bb.clear();
@@ -46,49 +47,41 @@ int main(int argc, char *argv[]) {
 		
 	}
 
-	/*
+
 	for ( i = 0; i < 5; i++) {
 		printf("direct weak %u\n", i);
-		for( j = 0; j <= index.maxtime; j++) {
+		for( j = 0; j <= index->getMaxtime(); j++) {
 			printf("time interval [0, %u)\n", j);
-			get_neighbors_weak(buffer, &index, i, 0, j);
+			index->direct_weak(i, 0, j, buffer);
 			printf("t=%u -> ", j);print_arraysort(buffer);
 		}
 	}
 
 	for ( i = 0; i < 5; i++) {
 		printf("direct strong %u\n", i);
-		for( j = 0; j <= index.maxtime; j++) {
+		for( j = 0; j <= index->getMaxtime(); j++) {
 			printf("time interval [0, %u)\n", j);
-			get_neighbors_strong(buffer, &index, i, 0, j);
+			index->direct_strong(i, 0, j, buffer);
 			printf("t=%u -> ", j);print_arraysort(buffer);
 		}
 	}
-*/
+	
  
 	for ( i = 0; i < 5; i++) {
 		printf("Reverses of node %u\n", i);
-		for( j = 0; j <= 5; j++) {
+		for( j = 0; j <= index->getMaxtime(); j++) {
 			index->reverse_point(i, j, buffer);
 			printf("t=%u <- ", j);print_arraysort(buffer);
 			bb.clear();
 		}
 		
 	}
-	/*
-	for ( i = 0; i < 5; i++) {
-		printf("Reverses of node %u (slow)\n", i);
-		for( j = 0; j <= 5; j++) {
-			get_reverse_point_slow(buffer, &index, i, j);
-			printf("t=%u <- ", j);print_arraysort(buffer);
-		}
-	}
-
+	
 	for ( i = 0; i < 5; i++) {
 			printf("Reverses weak %u\n", i);
-			for( j = 0; j <= index.maxtime; j++) {
+			for( j = 0; j <= index->getMaxtime(); j++) {
 				printf("time interval [0, %u)\n", j);
-				get_reverse_weak(buffer, &index, i, 0, j);
+				index->reverse_weak(i, 0, j, buffer);
 				printf("t=%u <- ", j);print_arraysort(buffer);
 			}
 		}
@@ -96,13 +89,13 @@ int main(int argc, char *argv[]) {
 
 	for ( i = 0; i < 5; i++) {
 			printf("Reverses strong %u\n", i);
-			for( j = 0; j <= index.maxtime; j++) {
+			for( j = 0; j <= index->getMaxtime(); j++) {
 				printf("time interval [0, %u)\n", j);
-				get_reverse_strong(buffer, &index, i, 0, j);
+				index->reverse_strong(i, 0, j, buffer);
 				printf("t=%u <- ", j);print_arraysort(buffer);
 			}
 		}
-*/
+	
 	//free(buffer);
 	return 0;
 }
