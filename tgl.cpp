@@ -47,7 +47,7 @@ TemporalGraphLog* TemporalGraphLog::load(ifstream &fp) {
 	TemporalGraphLog *ret;
 	//ret = new TemporalGraphLog();
 	ret = loadValue<TemporalGraphLog>(fp,1);
-	printf("changes: %u\n", ret->get_changes());
+	//printf("changes: %u\n", ret->get_changes());
 	ret->log = WaveletKdMatrix::load(fp);
 	ret->time = BitSequence::load(fp);
 	return ret;
