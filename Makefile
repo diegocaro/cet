@@ -6,20 +6,20 @@ DEPEN_WT64_OBJS=wavelet_kd_matrix.o symbols.o
 
 CC=g++
 DEBUG = -g -DDEBUG
-CFLAGS=-c -Wall -I$(DEPEN_LIBCDS_INC) -I$(DEPEN_WT64) #-O9
+CFLAGS=-c -Wall -I$(DEPEN_LIBCDS_INC) -I$(DEPEN_WT64) -O3
 LDFLAGS=-Wall $(DEPEN_LIBCDS) -lm
 
 EXT=
 
-SOURCES=tgl.cpp
+SOURCES=tgl.cpp arraysort.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 
 DEPENOBJS+=$(addprefix $(DEPEN_WT64), $(DEPEN_WT64_OBJS))
 
-MAINSRC=create.cpp use.cpp test.cpp benchmark.cpp
+MAINSRC=create.cpp use.cpp benchmark.cpp
 MAINOBJ=$(MAINSRC:.cpp=.o)
 
-EXECUTABLE=create use test benchmark
+EXECUTABLE=create use benchmark
 
 #all: CFLAGS += -O9
 all: $(SOURCES) $(MAINSRC) $(MAINOBJ) $(OBJECTS) $(EXECUTABLE) 
@@ -48,7 +48,4 @@ use: use.o
 	$(CC) $(OBJECTS) $(DEPENOBJS) $< -o $@$(EXT) $(LDFLAGS)
 
 benchmark: benchmark.o
-	$(CC) $(OBJECTS) $(DEPENOBJS) $< -o $@$(EXT) $(LDFLAGS)
-
-test: test.o
 	$(CC) $(OBJECTS) $(DEPENOBJS) $< -o $@$(EXT) $(LDFLAGS)
