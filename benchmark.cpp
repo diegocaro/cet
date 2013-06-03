@@ -15,8 +15,6 @@
 
 #include "arraysort.h"
 
-//#define EXPERIMENTS 1
-
 /*
 FIXME: Non soporta un numero de nodos maior que MAX_INT.
 
@@ -147,6 +145,10 @@ int main(int argc, char ** argv) {
         TimeQuery * queries = readQueries(argv[2], &nqueries);
 
         int i;
+
+#ifndef EXPERIMENTS
+	printf("We are checking the results... Experiments mode off.\n");
+#endif
 
         startTimer();
 
