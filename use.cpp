@@ -7,17 +7,7 @@
 
 #include <cstdio>
 #include "tgl.h"
-
-
-void print_arraysort(unsigned int *a) {
-  uint i;
-
-  for (i = 1; i <= *a; i++) {
-    printf("%d ", a[i]);
-  }
-  printf("\n");
-
-}
+#include "arraysort.h"
 
 int main(int argc, char *argv[]) {
 	TemporalGraphLog *index;

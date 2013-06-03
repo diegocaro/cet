@@ -13,6 +13,8 @@
 #include "tgl.h"
 #include "debug.h"
 
+#include "arraysort.h"
+
 //#define EXPERIMENTS 1
 
 /*
@@ -46,16 +48,6 @@ int compareRes(unsigned int * l1, unsigned int * l2) {
                 }
         }
         return 0;
-}
-
-void print_arraysort(unsigned int *a) {
-  uint i;
-
-  for (i = 1; i <= *a; i++) {
-    printf("%d ", a[i]);
-  }
-  printf("\n");
-
 }
 
 typedef struct squery {
@@ -188,23 +180,27 @@ int main(int argc, char ** argv) {
 			index->reverse_point(query.row, query.time, gotreslist);
                         break;
                 }
-                /*case DIRECT_NEIGHBORS_WEAK: {
-                        get_neighbors_weak(gotreslist, &index, query.row, query.initime, query.endtime);
+                case DIRECT_NEIGHBORS_WEAK: {
+                        //get_neighbors_weak(gotreslist, &index, query.row, query.initime, query.endtime);
+			index->direct_weak(query.row, query.initime, query.endtime, gotreslist);
                         break;
                 }
                 case REVERSE_NEIGHBORS_WEAK: {
-                        get_reverse_weak(gotreslist, &index, query.row, query.initime, query.endtime);
+                        //get_reverse_weak(gotreslist, &index, query.row, query.initime, query.endtime);
+			index->reverse_weak(query.row, query.initime, query.endtime, gotreslist);
                         break;
                 }
                 case DIRECT_NEIGHBORS_STRONG: {
-                        get_neighbors_strong(gotreslist, &index, query.row, query.initime, query.endtime);
+                        //get_neighbors_strong(gotreslist, &index, query.row, query.initime, query.endtime);
+			index->direct_strong(query.row, query.initime, query.endtime, gotreslist);
                         break;
                 }
                 case REVERSE_NEIGHBORS_STRONG: {
-                        get_reverse_strong(gotreslist, &index, query.row, query.initime, query.endtime);
+//                        get_reverse_strong(gotreslist, &index, query.row, query.initime, query.endtime);
+			index->reverse_strong(query.row, query.initime, query.endtime, gotreslist);
                         break;
                 }
-		*/
+		
 //              case FULLRANGE: {
 //                      gotres = findRange(tree, 0, tree->nNodesReal, 0, tree->nNodesReal, time)[0][0];
 //                      break;
