@@ -125,7 +125,7 @@ int main(int argc, char ** argv) {
         uint gotres = 0;
 
         if (argc < 3) {
-                printf("Usage: %s <graphfile> <queryfile> [<gotqueryfile>]", argv[0]);
+                printf("Usage: %s <graphfile> <queryfile> [<gotqueryfile>]\n", argv[0]);
                 exit(1);
         }
         if (argc == 4) {
