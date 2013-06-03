@@ -48,6 +48,8 @@ void read(struct adjlog *l) {
 	l->time = (uint *) calloc((l->size_time/W + 1), sizeof(uint));
 	l->log = (usym *) malloc(l->size_log * sizeof(usym));
 	
+	INFO("Memory acquiered");
+	
 //	printf("int1: %X\n", in1((uint)1, (uint)1));
 	
 	uint bitpos=0;
