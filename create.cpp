@@ -91,7 +91,7 @@ void read_stdin(struct adjlog *l) {
 		bitpos++;
 		
 #ifdef DEBUG
-		if(changes_read++%10000==0) fprintf(stderr,"Progress: %.2f%%\r", (float)changes_read/changes*100);
+		if(changes_read++%100000==0) fprintf(stderr,"Progress: %.2f%%\r", (float)changes_read/changes*100);
 #endif
 	}
 	bitset(l->time, bitpos);
