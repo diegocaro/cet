@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
 	struct adjlog tg;
 	TemporalGraphLog tgl;
 	
-        if (argc < 3) {
+        if (argc < 2) {
                 fprintf(stderr, "%s <outputfile> [dataset.bin]\n", argv[0]);
                 exit(-1);
         }
