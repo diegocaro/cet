@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <sys/types.h>
 #include <getopt.h>
-
+#include <cstring>
 #include "debug.h"
 #include "symbols.h"
 #include "tgl.h"
