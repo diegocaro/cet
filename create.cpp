@@ -69,6 +69,9 @@ void read_stdin(struct adjlog *l) {
 	//u_long *p;
 	//p = l->log;
 	uint k=0;
+	
+	uint changes_read=0;
+	
 	while(EOF != scanf("%u %u %u %u", &a[0], &a[1], &a[2], &a[3])) {
 		//*p++ = in1(a[0], a[1]);
 		l->log[k].x = a[0];
@@ -86,6 +89,10 @@ void read_stdin(struct adjlog *l) {
 		
 		t = a[2];
 		bitpos++;
+		
+#ifdef DEBUG
+		if(changes_read++%10000==0) fprintf(stderr,"Progress: %.2f%%\r", (float)changes_read/changes*100);
+#endif
 	}
 	bitset(l->time, bitpos);
 	
