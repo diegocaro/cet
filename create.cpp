@@ -1,26 +1,38 @@
 #include <cstdio>
 #include <cstdlib>
 #include <sys/types.h>
+#include <getopt.h>
+
 #include "debug.h"
 #include "symbols.h"
 #include "tgl.h"
 
 struct infolog {
-        uint nodes;
-        uint changes;
-        uint maxtime;
+	uint nodes;
+	uint changes;
+	uint maxtime;
 };
 
 struct adjlog {
-        uint nodes; //number of nodes from [0 ... nodes -1]
-        uint changes; //total number of changes
-        uint maxtime; //maximum time in the dataset from [0 ... maxtime-1]
+	uint nodes; //number of nodes from [0 ... nodes -1]
+	uint changes; //total number of changes
+	uint maxtime; //maximum time in the dataset from [0 ... maxtime-1]
 
-        uint size_log; //size of the log
-        usym *log; //including time and edges
+	uint size_log; //size of the log
+	usym *log; //including time and edges
 
-        uint *time; // bitmap of time in nodes
-        uint size_time;
+	uint *time; // bitmap of time in nodes
+	uint size_time;
+};
+
+
+enum bitseq {
+	RG, R3,
+};
+
+struct opts {
+	enum bitseq bs; //bit data structure
+	char *outfile;
 };
 
 
@@ -49,19 +61,19 @@ void read_stdin(struct adjlog *l) {
 	
 	INFO("Memory acquiered");
 	
-//	printf("int1: %X\n", in1((uint)1, (uint)1));
+	//	printf("int1: %X\n", in1((uint)1, (uint)1));
 	
 	uint bitpos=0;
 	uint i;
 	t = 0;
 	//u_long *p;
 	//p = l->log;
-  uint k=0;
+	uint k=0;
 	while(EOF != scanf("%u %u %u %u", &a[0], &a[1], &a[2], &a[3])) {
 		//*p++ = in1(a[0], a[1]);
-    l->log[k].x = a[0];
-    l->log[k].y = a[1];    
-    k++;
+		l->log[k].x = a[0];
+		l->log[k].y = a[1];    
+		k++;
     
 		if (t != a[2]) {
 			//put time mark
@@ -80,36 +92,86 @@ void read_stdin(struct adjlog *l) {
 }
 
 
-void create_index(TemporalGraphLog &tgl, struct adjlog *adjlog) {
+void create_index(TemporalGraphLog &tgl, struct adjlog *adjlog, struct opts *opts) {
+	BitSequenceBuilder *bs;
+	
 	tgl.set_nodes(adjlog->nodes);
 	tgl.set_changes(adjlog->changes);
 	tgl.set_maxtime(adjlog->maxtime);
-	tgl.set_log(adjlog->log, adjlog->size_log);
-	tgl.set_time(adjlog->time, adjlog->size_time);
+	
+	switch(opts->bs) {
+		case RG:
+		bs = new BitSequenceBuilderRG(20); // by default, 5% of extra space for bitmaps
+		break;
+		case R3:
+		bs = new BitSequenceBuilderRRR(32); // DEFAULT_SAMPLING for RRR is 32 
+		break;
+	}
+	
+	tgl.set_log(adjlog->log, adjlog->size_log, bs);
+	
+	tgl.set_time(adjlog->time, adjlog->size_time, bs);
 	
 }
 
+int readopts(int argc, char **argv, struct opts *opts) {
+	int o;
+	
+	
+	// Default options
+	opts->bs = RG;
+
+	while ((o = getopt(argc, argv, "b:")) != -1) {
+		switch (o) {
+			case 'b':
+			if(strcmp(optarg, "RG")==0) {
+				INFO("Using RG for bitmaps");
+				opts->bs = RG;
+			}
+			else if(strcmp(optarg, "RRR")==0) {
+				INFO("Using RRR for bitmaps");
+				opts->bs = R3;
+			}
+			break;
+			default: /* '?' */
+			break;
+		}
+	}
+	
+        if (optind >= argc || (argc-optind) < 1) {
+		fprintf(stderr, "%s [-b RG,RRR]<outputfile> \n", argv[0]);
+		fprintf(stderr, "Expected argument after options\n");
+		exit(EXIT_FAILURE);
+        }
+	
+	opts->outfile = argv[optind];
+	
+	return optind;
+
+}
+
+
 int main(int argc, char *argv[]) {
 	struct adjlog tg;
+	struct opts opts;
+	int optind;
+	
 	TemporalGraphLog tgl;
 	
-        if (argc < 2) {
-                fprintf(stderr, "%s <outputfile> [dataset.bin]\n", argv[0]);
-                exit(-1);
-        }
+	optind = readopts(argc, argv, &opts);
 	
 	INFO("Loading graph...");
 	read_stdin(&tg);
 	
 	INFO("Creating index...");
-	create_index(tgl, &tg);
+	create_index(tgl, &tg, &opts);
 	LOG("Size of index: %lu\n", tgl.getSize());
 	
 	//LOG("Depth: %u", tgl.get_log()->getDepth());
 	
 	ofstream file;
-  LOG("Saving graph file in '%u'\n", argv[1]);
-	file.open(argv[1], ios::binary);
+	LOG("Saving graph file in '%s'\n", opts.outfile);
+	file.open(opts.outfile, ios::binary);
 	tgl.save(file);
 	file.close();
 	

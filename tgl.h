@@ -11,8 +11,8 @@ public:
 	TemporalGraphLog();
 	TemporalGraphLog(uint nodes, uint changes, uint maxtime);
 	
-	void set_log(usym *log, uint size_log);
-	void set_time(uint *time, uint size_time);
+	void set_log(usym *log, uint size_log, BitSequenceBuilder *bs);
+	void set_time(uint *time, uint size_time, BitSequenceBuilder *bs);
 	
 	void set_nodes(uint nodes);
 	void set_changes(uint changes);

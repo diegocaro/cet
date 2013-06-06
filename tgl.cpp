@@ -16,7 +16,7 @@ void TemporalGraphLog::set_changes(uint changes) {this->changes = changes;}
 void TemporalGraphLog::set_maxtime(uint maxtime) {this->maxtime = maxtime;}
 
 
-void TemporalGraphLog::set_log(usym *log, uint size_log) {
+void TemporalGraphLog::set_log(usym *log, uint size_log, BitSequenceBuilder *bs) {
 	this->size_log = size_log;
 	/*this->log = new WaveletTree(log, size_log,
 			new wt_coder_binary(log, size_log, new MapperNone()),
@@ -28,13 +28,13 @@ void TemporalGraphLog::set_log(usym *log, uint size_log) {
   			new wt_coder_huff_morton(log, size_log),
   			new BitSequenceBuilderRG(20));
 	*/
-	this->log = new WaveletKdMatrix(log, size_log, new BitSequenceBuilderRG(20));
+	this->log = new WaveletKdMatrix(log, size_log, bs);
   
 }
 
-void TemporalGraphLog::set_time(uint *time, uint size_time) {
+void TemporalGraphLog::set_time(uint *time, uint size_time, BitSequenceBuilder *bs) {
 	this->size_time = size_time;
-	this->time = new BitSequenceRG(time, size_time, 20);
+	this->time = bs->build(time, size_time);
 }
 
 void TemporalGraphLog::save(ofstream &fp) {
