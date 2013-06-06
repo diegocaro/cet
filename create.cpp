@@ -9,7 +9,6 @@ struct infolog {
         uint nodes;
         uint changes;
         uint maxtime;
-        uint size;
 };
 
 struct adjlog {
@@ -26,7 +25,7 @@ struct adjlog {
 
 
 // read temporal graph and populate adjlog
-void read(struct adjlog *l) {
+void read_stdin(struct adjlog *l) {
 	uint nodes, changes, maxtime;
 	uint a[4];
 	uint t;
@@ -95,12 +94,12 @@ int main(int argc, char *argv[]) {
 	TemporalGraphLog tgl;
 	
         if (argc < 3) {
-                fprintf(stderr, "%s <dataset> <outputfile>\n", argv[0]);
+                fprintf(stderr, "%s <outputfile> [dataset.bin]\n", argv[0]);
                 exit(-1);
         }
 	
 	INFO("Loading graph...");
-	read(&tg);
+	read_stdin(&tg);
 	
 	INFO("Creating index...");
 	create_index(tgl, &tg);
@@ -109,7 +108,8 @@ int main(int argc, char *argv[]) {
 	//LOG("Depth: %u", tgl.get_log()->getDepth());
 	
 	ofstream file;
-	file.open(argv[2], ios::binary);
+  LOG("Saving graph file in '%u'\n", argv[1]);
+	file.open(argv[1], ios::binary);
 	tgl.save(file);
 	file.close();
 	
