@@ -70,7 +70,9 @@ void read_stdin(struct adjlog *l) {
 	//p = l->log;
 	uint k=0;
 	
+#ifdef DEBUG
 	uint changes_read=0;
+#endif
 	
 	while(EOF != scanf("%u %u %u %u", &a[0], &a[1], &a[2], &a[3])) {
 		//*p++ = in1(a[0], a[1]);

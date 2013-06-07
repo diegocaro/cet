@@ -215,3 +215,16 @@ void TemporalGraphLog::reverse_weak(uint node, uint tstart, uint tend, uint *res
 void TemporalGraphLog::reverse_strong(uint node, uint tstart, uint tend, uint *res) const {
 	reverse_interval(node, tstart, tend, 1, res);
 }
+
+
+uint TemporalGraphLog::snapshot(uint t) const {
+	size_t etime;
+	etime = pos_time(t);
+	
+	vector<pair<usym,uint> > ans;
+	
+	log->rankall(0, etime,ans);
+
+	
+	return etime;
+}

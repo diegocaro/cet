@@ -29,6 +29,7 @@ public:
 	
 	uint getMaxtime() { return maxtime;}
 	
+	uint snapshot(uint t) const;
 	
 	void direct_point(uint node, uint t, uint *res) const;
 	void direct_weak(uint node, uint tstart, uint tend, uint *res) const;
