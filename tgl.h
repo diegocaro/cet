@@ -4,7 +4,7 @@
 #include <BitSequence.h>
 #include "wavelet_kd_matrix.h"
 
-#define BUFFER 1024*1024
+#define BUFFER 1024*1024*10
 
 class TemporalGraphLog {
 public:
