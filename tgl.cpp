@@ -228,3 +228,78 @@ uint TemporalGraphLog::snapshot(uint t) const {
 	
 	return etime;
 }
+
+
+int TemporalGraphLog::edge_point(uint u, uint v, uint t) {
+	size_t ptime;
+	ptime = pos_time(t);
+        
+        struct symbols s;
+        s.x=u;
+        s.y=v;
+        
+        if (log->rank(s, ptime) % 2 == 1) {
+                return 1;
+        }
+        return 0;
+}
+
+int TemporalGraphLog::edge_interval(uint u, uint v, uint tstart, uint tend, uint semantic) {
+	size_t sptime;
+        size_t eptime;
+	sptime = pos_time(tstart);
+        eptime = pos_time(tend);
+        
+        struct symbols s;
+        s.x=u;
+        s.y=v;
+        
+        uint rstart;
+        uint rend;
+        
+        rstart = log->rank(s, sptime);
+        rend = log->rank(s, eptime);
+        
+        if (semantic == 0) {
+                if ( ( rstart % 2 == 1) || (rend > rstart) ) 
+                        return 1;
+        }
+        else if (semantic == 1) {
+                if ( ( rstart % 2 == 1) && (rend == rstart) ) 
+                        return 1;
+        }
+        
+        return 0;
+        
+}
+
+int TemporalGraphLog::edge_weak(uint u, uint v, uint tstart, uint tend) {
+        return edge_interval(u, v, tstart, tend, 0);
+}
+int TemporalGraphLog::edge_strong(uint u, uint v, uint tstart, uint tend){
+        return edge_interval(u, v, tstart, tend, 1);
+}
+
+int TemporalGraphLog::edge_next(uint u, uint v, uint t) {
+	size_t ptime;
+	ptime = pos_time(t);
+        
+        struct symbols s;
+        s.x=u;
+        s.y=v;
+        
+        uint r;
+        r = log->rank(s, ptime);
+        
+        if (r % 2 == 1) {
+                return t;
+        }
+        
+        uint l;
+        l = log->select(s, r+1);
+        if ( l != log->n ) {
+                return time->rank1(l);
+        }
+        
+        return -1;
+}
