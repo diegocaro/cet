@@ -23,11 +23,13 @@ pode haber repetidos)
 */
 
 
-#define CELL 6
-#define CELL_WEAK 7
-#define CELL_STRONG 8
+#define EDGE 6
+#define EDGE_WEAK 7
+#define EDGE_STRONG 8
 
 #define SNAPSHOT 9
+
+#define EDGE_NEXT 10
 
 #define DIRECT_NEIGHBORS 0
 #define REVERSE_NEIGHBORS 1
@@ -72,11 +74,11 @@ TimeQuery * readQueries(char * filename, int * nqueries) {
                 res = fscanf(queryFile, "%d", &query->type);
                 if (res == EOF) break;
                 switch(query->type) {
-                        case CELL: {
+                        case EDGE: case EDGE_NEXT: {
                                 res = fscanf(queryFile, "%d %d %d\n", &query->row, &query->column, &query->time);
                                 break;
                         }
-                        case CELL_WEAK: case CELL_STRONG: {
+                        case EDGE_WEAK: case EDGE_STRONG: {
                                 res = fscanf(queryFile, "%d %d %d %d\n", &query->row, &query->column, &query->initime, &query->endtime);
                                 break;
                         }
@@ -96,7 +98,7 @@ TimeQuery * readQueries(char * filename, int * nqueries) {
                         }
                 }
 
-                if(query->type  == CELL || query->type == CELL_STRONG || query->type == CELL_WEAK || query->type == SNAPSHOT)
+                if(query->type  == EDGE || query->type == EDGE_NEXT || query->type == EDGE_STRONG || query->type == EDGE_WEAK || query->type == SNAPSHOT)
                         res = fscanf(queryFile, "%d\n", &query->expectednres);
                 else {
                         res = fscanf(queryFile, "%d", &query->expectednres);
@@ -166,18 +168,26 @@ int main(int argc, char ** argv) {
 		//cleaning vector of results
 
                 switch(query.type) {
-//                case CELL: {
-//                        gotres = findEdge(tree, query.row, query.column, query.time);
-//                        break;
-//                }
-//                case CELL_WEAK: {
-//                        gotres = findEdgeInterval(tree, query.row, query.column, query.initime, query.endtime, 0);
-//                        break;
-//                }
-//                case CELL_STRONG: {
-//                        gotres = findEdgeInterval(tree, query.row, query.column, query.initime, query.endtime, 1);
-//                        break;
-//                }
+               case EDGE: {
+                       gotres = index->edge_point(query.row, query.column, query.time);
+                       //gotres = findEdge(tree, query.row, query.column, query.time);
+                       break;
+               }
+               case EDGE_NEXT: {
+                       //gotres = findEdgeInterval(tree, query.row, query.column, query.initime, query.endtime, 1);
+                       gotres = index->edge_next(query.row, query.column, query.time);
+                       break;
+               }
+               case EDGE_WEAK: {
+                       //gotres = findEdgeInterval(tree, query.row, query.column, query.initime, query.endtime, 0);
+                       gotres = index->edge_weak(query.row, query.column, query.initime, query.endtime);
+                       break;
+               }
+               case EDGE_STRONG: {
+                       //gotres = findEdgeInterval(tree, query.row, query.column, query.initime, query.endtime, 1);
+                       gotres = index->edge_strong(query.row, query.column, query.initime, query.endtime);
+                       break;
+               }
                 case DIRECT_NEIGHBORS: {
                         //get_neighbors_point(gotreslist, &index, query.row, query.time);
 			index->direct_point(query.row, query.time, gotreslist);
@@ -224,11 +234,11 @@ int main(int argc, char ** argv) {
                   if (savegotFile) {
                     gotFile = fopen(gotqueryFile, "a");
                     switch(query.type) {
-                    case CELL: {
+                    case EDGE: case EDGE_NEXT: {
                       fprintf(gotFile, "%d %d %d\n", query.row, query.column, query.time);
                       break;
                     }
-                    case CELL_WEAK: case CELL_STRONG: {
+                    case EDGE_WEAK: case EDGE_STRONG: {
                       fprintf(gotFile, "%d %d %d %d\n", query.row, query.column, query.initime, query.endtime);
                       break;
                     }
@@ -246,7 +256,7 @@ int main(int argc, char ** argv) {
 		    break;
                     }
 
-                    if (query.type == CELL || query.type == CELL_WEAK || query.type == CELL_STRONG || query.type == SNAPSHOT) {
+                    if (query.type == EDGE || query.type == EDGE_NEXT || query.type == EDGE_WEAK || query.type == EDGE_STRONG || query.type == SNAPSHOT) {
                       fprintf(gotFile,"%d\n", gotres);
                     } else {
                       uint j;
@@ -262,7 +272,7 @@ int main(int argc, char ** argv) {
 
 
                   int failcompare = 0;
-                  if (query.type == CELL || query.type == CELL_WEAK || query.type == CELL_STRONG || query.type == SNAPSHOT) {
+                  if (query.type == EDGE || query.type == EDGE_NEXT || query.type == EDGE_WEAK || query.type == EDGE_STRONG || query.type == SNAPSHOT) {
                     failcompare = (gotres != query.expectednres);
                   } else {
                     failcompare = compareRes(gotreslist, query.expectedres);
@@ -272,7 +282,7 @@ int main(int argc, char ** argv) {
                     printf("query queryType=%d, row=%d, column=%d, time=%d, initime=%d, endtime=%d, expectedres=%d\n", query.type, query.row, query.column, query.time, query.initime, query.endtime, query.expectednres);
                     printf("count: got %d expected %d\n", gotres, query.expectednres);
                     
-		    if ( ! (query.type == CELL || query.type == CELL_WEAK || query.type == CELL_STRONG || query.type == SNAPSHOT)) {
+		    if ( ! (query.type == EDGE || query.type == EDGE_NEXT || query.type == EDGE_WEAK || query.type == EDGE_STRONG || query.type == SNAPSHOT)) {
 		        printf("expected: "); print_arraysort(query.expectedres);
                         printf("got     : "); print_arraysort(gotreslist);
 	    	    }
