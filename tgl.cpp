@@ -1,7 +1,10 @@
 #include "tgl.h"
 #include "arraysort.h"
-
+#include "mywtkdmatrix.h"
 //#include "interleave.h"
+
+
+uint buffer[BUFFER];
 
 TemporalGraphLog::TemporalGraphLog() {};
 
@@ -16,7 +19,7 @@ void TemporalGraphLog::set_changes(uint changes) {this->changes = changes;}
 void TemporalGraphLog::set_maxtime(uint maxtime) {this->maxtime = maxtime;}
 
 
-void TemporalGraphLog::set_log(usym *log, uint size_log, BitSequenceBuilder *bs) {
+void TemporalGraphLog::set_log(usym *log, size_t size_log, BitSequenceBuilder *bs) {
 	this->size_log = size_log;
 	/*this->log = new WaveletTree(log, size_log,
 			new wt_coder_binary(log, size_log, new MapperNone()),
@@ -32,7 +35,7 @@ void TemporalGraphLog::set_log(usym *log, uint size_log, BitSequenceBuilder *bs)
   
 }
 
-void TemporalGraphLog::set_time(uint *time, uint size_time, BitSequenceBuilder *bs) {
+void TemporalGraphLog::set_time(uint *time, size_t size_time, BitSequenceBuilder *bs) {
 	this->size_time = size_time;
 	this->time = bs->build(time, size_time);
 }
@@ -70,47 +73,25 @@ size_t TemporalGraphLog::pos_time(size_t i) const {
 void TemporalGraphLog::direct_point(uint node, uint t, uint *res) const {
 	size_t ptime;
 	ptime = pos_time(t);
-	
-	vector<uint> ans;
-	
-	log->axis(0U, ptime, 0U, node, ans);
-	
-	
-	uint j = 0;
-	for(uint i = 0; i < ans.size(); i+=2) {
-		if (ans[i+1]%2 == 1) {
-			res[++j] = ans[i];
-		}
-	}
-	*res = j;
+
+	*res = 0;
+	((MyWaveletKdMatrix *)log)->axis<append_odd>(0U, ptime, 0U, node, res);
 }
 
 void TemporalGraphLog::direct_interval(uint node, uint tstart, uint tend, uint semantic, uint *res) const {
-	uint *buffer;
-
-	buffer = new uint[BUFFER];
-	
-	
 	size_t sptime;
 	size_t eptime;
 	sptime = pos_time(tstart);
 	eptime = pos_time(tend);
 	
 	
-	vector<uint> rng;
-	log->axis(sptime, eptime, 0U, node, rng);
-
-	uint j;
-	uint i;
-	j = 0;
-	for (i = 0; i < rng.size(); i += 2) {
-		buffer[++j] = rng[i];
-	}
-	*buffer = j;
+	*buffer = 0;
+	((MyWaveletKdMatrix *)log)->axis<append_symbol>(sptime, eptime, 0U, node, buffer);
 	
 	*res = 0;
 	direct_point(node, tstart, res);
-	
+
+	uint i,j;
 	if (semantic == 0) { //semantic weak
 		j = *res;
 		for (i = 1; i <= *buffer; i++) {
@@ -128,8 +109,6 @@ void TemporalGraphLog::direct_interval(uint node, uint tstart, uint tend, uint s
 		diff_arraysort(res, buffer);
 	}
 	
-	
-	delete [] buffer;
 }
 
 void TemporalGraphLog::direct_weak(uint node, uint tstart, uint tend, uint *res) const {
@@ -145,48 +124,25 @@ void TemporalGraphLog::reverse_point(uint node, uint t, uint *res) const {
 	size_t ptime;
 	ptime = pos_time(t);
 	
-	vector<uint> ans;
-	log->axis(0U, ptime, 1U, node, ans);
-	
-	
-	
-	uint j = 0;
-	for(uint i = 0; i < ans.size(); i+=2) {
-		if (ans[i+1]%2 == 1) {
-			res[++j] = ans[i];
-		}
-	}
-	*res = j;
-	
+	*res = 0;
+	((MyWaveletKdMatrix *)log)->axis<append_odd>(0U, ptime, 1U, node, res);
 }
 
 
 void TemporalGraphLog::reverse_interval(uint node, uint tstart, uint tend, uint semantic, uint *res) const {
-	uint *buffer;
-
-	buffer = new uint[BUFFER];
-	
-	
 	size_t sptime;
 	size_t eptime;
 	sptime = pos_time(tstart);
 	eptime = pos_time(tend);
 	
-	
-	vector<uint> rng;
-	log->axis(sptime, eptime, 1U, node, rng);
+	*buffer = 0;
+	((MyWaveletKdMatrix *)log)->axis<append_symbol>(sptime, eptime, 1U, node, buffer);
+
+	*res = 0;
+	reverse_point(node, tstart, res);
 
 	uint j;
 	uint i;
-	j = 0;
-	for (i = 0; i < rng.size(); i += 2) {
-		buffer[++j] = rng[i];
-	}
-	*buffer = j;
-	
-	*res = 0;
-	reverse_point(node, tstart, res);
-	
 	if (semantic == 0) { //semantic weak
 		j = *res;
 		for (i = 1; i <= *buffer; i++) {
@@ -203,9 +159,6 @@ void TemporalGraphLog::reverse_interval(uint node, uint tstart, uint tend, uint 
 		//printf("direct neighbors: "); print_arraysort(buffer3);
 		diff_arraysort(res, buffer);
 	}
-	
-	
-	delete [] buffer;
 }
 
 void TemporalGraphLog::reverse_weak(uint node, uint tstart, uint tend, uint *res) const {
@@ -217,16 +170,16 @@ void TemporalGraphLog::reverse_strong(uint node, uint tstart, uint tend, uint *r
 }
 
 
-uint TemporalGraphLog::snapshot(uint t) const {
+size_t TemporalGraphLog::snapshot(uint t) const {
 	size_t etime;
 	etime = pos_time(t);
 	
-	vector<pair<usym,uint> > ans;
+	size_t active_edges=0;
 	
-	log->rankall(0, etime,ans);
+	((MyWaveletKdMatrix *)log)->rankall(0, etime,active_edges);
 
 	
-	return etime;
+	return active_edges;
 }
 
 

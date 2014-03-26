@@ -11,8 +11,8 @@ public:
 	TemporalGraphLog();
 	TemporalGraphLog(uint nodes, uint changes, uint maxtime);
 	
-	void set_log(usym *log, uint size_log, BitSequenceBuilder *bs);
-	void set_time(uint *time, uint size_time, BitSequenceBuilder *bs);
+	void set_log(usym *log, size_t size_log, BitSequenceBuilder *bs);
+	void set_time(uint *time, size_t size_time, BitSequenceBuilder *bs);
 	
 	void set_nodes(uint nodes);
 	void set_changes(uint changes);
@@ -29,7 +29,7 @@ public:
 	
 	uint getMaxtime() { return maxtime;}
 	
-	uint snapshot(uint t) const;
+	size_t snapshot(uint t) const;
 	
 	void direct_point(uint node, uint t, uint *res) const;
 	void direct_weak(uint node, uint tstart, uint tend, uint *res) const;
@@ -58,8 +58,9 @@ protected:
         uint maxtime;
         WaveletKdMatrix *log;
         BitSequence *time;
-        uint size_log;
-        uint size_time;
+
+        size_t size_log;
+        size_t size_time;
 		
 		
 		

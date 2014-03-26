@@ -14,7 +14,7 @@ LDFLAGS=-Wall $(DEPEN_LIBCDS) -lm
 
 EXT=
 
-SOURCES=tgl.cpp arraysort.cpp
+SOURCES=tgl.cpp arraysort.cpp mywtkdmatrix.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 
 DEPENOBJS+=$(addprefix $(DEPEN_WT64), $(DEPEN_WT64_OBJS))
