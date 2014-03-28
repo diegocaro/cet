@@ -19,10 +19,10 @@ OBJECTS=$(SOURCES:.cpp=.o)
 
 DEPENOBJS+=$(addprefix $(DEPEN_WT64), $(DEPEN_WT64_OBJS))
 
-MAINSRC=create.cpp use.cpp benchmark.cpp
+MAINSRC=create.cpp use.cpp benchmark.cpp exp-query.cpp
 MAINOBJ=$(MAINSRC:.cpp=.o)
 
-EXECUTABLE=create use benchmark
+EXECUTABLE=create use benchmark exp-query
 
 #all: CFLAGS += -O9
 all: $(SOURCES) $(MAINSRC) $(MAINOBJ) $(OBJECTS) $(EXECUTABLE) 
@@ -54,4 +54,8 @@ use: use.o
 	$(CC) $(OBJECTS) $(DEPENOBJS) $< -o $@$(EXT) $(LDFLAGS)
 
 benchmark: benchmark.o
+	$(CC) $(OBJECTS) $(DEPENOBJS) $< -o $@$(EXT) $(LDFLAGS)
+
+
+exp-query: exp-query.o
 	$(CC) $(OBJECTS) $(DEPENOBJS) $< -o $@$(EXT) $(LDFLAGS)
