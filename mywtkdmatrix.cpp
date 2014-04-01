@@ -8,6 +8,15 @@
 #include "mywtkdmatrix.h"
 #include "debug.h"
 
+#include <queue>
+
+struct wt_info {
+	size_t start;
+	size_t end;
+	uint level;
+	uint value;
+};
+
 
 template void MyWaveletKdMatrix::axis<append_odd>(size_t start, size_t end, uint axis, uint node, uint *res);
 template void MyWaveletKdMatrix::_axis<append_odd>(size_t start, size_t end, uint axis, usym node, uint level, uint value, uint *res);
@@ -27,7 +36,104 @@ void MyWaveletKdMatrix::axis(size_t start, size_t end, uint axis, uint node, uin
 	}
 	*res = 0;
 	LOG("neighbors of {%u, %u}", n.x, n.y);
+
+	//A queue based algorithm is used
 	_axis<F>(start, end, axis, n, 0, 0, res);
+
+	// Iterative code using a Queue
+	/*
+	queue<struct wt_info> q;
+	wt_info z,t;
+	z.start = start;
+	z.end = end;
+	z.level = 0;
+	z.value = 0;
+	q.push(z);
+	uint value;
+
+	while (!q.empty()) {
+		z = q.front();
+		q.pop();
+
+
+		size_t s0,e0,s1,e1;
+
+		s1 = bitmap[z.level]->rank1(z.start-1);
+		e1 = bitmap[z.level]->rank1(z.end-1);
+
+		//printf("s1: %u\ne1: %u\n", s1,e1);
+
+		s0 = z.start - s1;
+		e0 = z.end - e1;
+	//	printf("s0: %u\ne0: %u\n", s0,e0);
+
+		if ( z.level % 2 == axis) {
+			// visitando la parte del nodo que me interesa :)
+			if (is_set(n,z.level)) {
+			//	printf("1");
+				//bajar nodo derecho
+				t.start = s1+Z[z.level];
+				t.end = e1+Z[z.level];
+			}
+			else {
+			//	printf("0");
+				//bajar nodo izq
+
+				t.start = s0;
+				t.end = e0;
+			}
+
+			if (t.start >= t.end) continue;
+
+			t.level = z.level +1;
+			t.value = z.value;
+
+			if (t.level == height) {
+				F(t.value, t.end-t.start,res);
+				continue;
+			}
+
+			q.push(t);
+
+		}
+		else { // bajar por ambos!
+			//printf("X");
+
+			t.start = s0;
+			t.end = e0;
+
+			if (t.start >= t.end) goto second_rec;
+
+			t.level = z.level +1;
+			t.value = z.value;
+
+			if (t.level == height) {
+				F(t.value, t.end-t.start,res);
+				goto second_rec;
+			}
+
+			q.push(t);
+
+	second_rec:
+			t.start = s1+Z[z.level];
+			t.end = e1+Z[z.level];
+
+			if (t.start >= t.end) continue;
+
+			t.level = z.level +1;
+			t.value = z.value | (1 << (height/2-z.level/2-1));
+
+			if (t.level == height) {
+				F(t.value, t.end-t.start,res);
+				continue;
+			}
+
+			q.push(t);
+		}
+
+	}
+	*/
+
 }
 
 template<action F>
