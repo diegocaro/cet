@@ -48,6 +48,7 @@ void startClockTime() {
 	myclock_gettime(&ts1);
 }
 
+//return nanosecs
 long endClockTime() {
 	myclock_gettime(&ts2);
 	return (ts2.tv_sec-ts1.tv_sec)*1000000000+(ts2.tv_nsec-ts1.tv_nsec);
