@@ -3,6 +3,10 @@
 #include <sys/types.h>
 #include <getopt.h>
 #include <cstring>
+
+#include <map>
+#include <vector>
+
 #include "debug.h"
 #include "symbols.h"
 #include "tgl.h"
@@ -100,6 +104,71 @@ void read_stdin(struct adjlog *l) {
 	
 }
 
+// read temporal graph from contacts
+void read_contacts(struct adjlog *l) {
+	uint nodes, edges, lifetime, contacts;
+		uint u,v,a,b;
+
+		map<uint, vector<usym> > btable;
+
+		scanf("%u %u %u %u", &nodes, &edges, &lifetime, &contacts);
+
+		uint c_read = 0;
+
+		usym c;
+
+		while( EOF != scanf("%u %u %u %u", &u, &v, &a, &b)) {
+			c_read++;
+			if(c_read%500000==0) fprintf(stderr, "Processing %.1f%%\r", (float)c_read/contacts*100);
+			c.x = u;
+			c.y = v;
+			btable[a].push_back(c);
+
+			if (b == lifetime-1) continue;
+
+			btable[b].push_back(c);
+		}
+		fprintf(stderr, "Processing %.1f%%\r", (float)c_read/contacts*100);
+		assert(c_read == contacts);
+
+		uint lenS = 2*contacts;
+
+		l->nodes = nodes;
+		l->changes= lenS;
+		l->maxtime = lifetime;
+
+		l->size_log = lenS; //uppper bound
+		l->size_time = lifetime + lenS; // in bits, upper bound
+		LOG("Nodes:\t%u", l->nodes);
+		LOG("Changes:\t%u", l->changes);
+		LOG("Maxtime:\t%u", l->maxtime);
+
+		LOG("space for log:\t%.2lf MBytes (%lu bytes)", (double)l->size_log*sizeof(u_long)/1024/1024, l->size_log*sizeof(u_long));
+
+		LOG("space for time:\t%.2lf MBytes (%lu bytes)", (double)(l->size_time/W+1)*sizeof(uint)/1024/1024, l->size_time/W*sizeof(uint));
+
+		l->time = (uint *) calloc((l->size_time/W + 1), sizeof(uint));
+		l->log = (usym *) malloc(l->size_log * sizeof(usym));
+
+		INFO("Memory acquiered");
+
+
+		uint p=0;
+
+		for(uint i=0; i < lifetime; i++) {
+
+			for (uint j=0; j < btable[i].size(); ++j) {
+				l->log[p].x = btable[i][j].x;
+				l->log[p].y = btable[i][j].y;
+				p++;
+			}
+			bitset(l->time, i+p);
+		}
+
+		l->size_log = p; //actual size (could be less than lenS)
+		l->size_time = lifetime + p; // in bits, actual value
+
+}
 
 void create_index(TemporalGraphLog &tgl, struct adjlog *adjlog, struct opts *opts) {
 	BitSequenceBuilder *bs;
@@ -170,7 +239,8 @@ int main(int argc, char *argv[]) {
 	optind = readopts(argc, argv, &opts);
 	
 	INFO("Loading graph...");
-	read_stdin(&tg);
+	//read_stdin(&tg);
+	read_contacts(&tg);
 	
 	INFO("Creating index...");
 	create_index(tgl, &tg, &opts);
