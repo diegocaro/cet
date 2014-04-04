@@ -143,7 +143,7 @@ void read_contacts(struct adjlog *l) {
 		LOG("Changes:\t%u", l->changes);
 		LOG("Maxtime:\t%u", l->maxtime);
 
-		LOG("space for log:\t%.2lf MBytes (%lu bytes)", (double)l->size_log*sizeof(u_long)/1024/1024, l->size_log*sizeof(u_long));
+		LOG("space for log:\t%.2lf MBytes (%lu bytes)", (double)l->size_log*sizeof(usym)/1024/1024, l->size_log*sizeof(usym));
 
 		LOG("space for time:\t%.2lf MBytes (%lu bytes)", (double)(l->size_time/W+1)*sizeof(uint)/1024/1024, l->size_time/W*sizeof(uint));
 
@@ -165,8 +165,8 @@ void read_contacts(struct adjlog *l) {
 			bitset(l->time, i+p);
 		}
 
-		l->size_log = p; //actual size (could be less than lenS)
-		l->size_time = lifetime + p; // in bits, actual value
+		//l->size_log = p; //actual size (could be less than lenS)
+		//l->size_time = lifetime + p; // in bits, actual value
 
 }
 

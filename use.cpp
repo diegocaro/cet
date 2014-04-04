@@ -24,6 +24,9 @@ int main(int argc, char *argv[]) {
 	f.open(argv[1], ios::binary);
 	index = TemporalGraphLog::load(f);
 	f.close();
+  
+  printf("Size of the structure: %lu\n", index->getSize());
+  
 /*
 	uint a,b;
 	printf("Write your query: ");

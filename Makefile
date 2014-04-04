@@ -5,7 +5,7 @@ DEPEN_WT64=../wtkdmatrix/
 DEPEN_WT64_OBJS=wavelet_kd_matrix.o symbols.o
 
 CC=g++
-DEBUG = -g -DDEBUG
+DEBUGFLAGS =-c -Wall -I$(DEPEN_LIBCDS_INC) -I$(DEPEN_WT64) -O0 -g -DDEBUG
 
 EXPERIMENTS = -DEXPERIMENTS
 
@@ -15,7 +15,7 @@ ifeq ($(UNAME), Linux)
 LDFLAGSRT = -lrt
 endif
 
-CFLAGS=-c -Wall -I$(DEPEN_LIBCDS_INC) -I$(DEPEN_WT64) -O3
+CFLAGS=-c -Wall -I$(DEPEN_LIBCDS_INC) -I$(DEPEN_WT64) -O3 
 LDFLAGS=-Wall $(DEPEN_LIBCDS) -lm $(LDFLAGSRT)
 
 EXT=
@@ -30,10 +30,10 @@ MAINOBJ=$(MAINSRC:.cpp=.o)
 
 EXECUTABLE=create use benchmark exp-query
 
-#all: CFLAGS += -O9
+#all: CFLAGS = -O9
 all: $(SOURCES) $(MAINSRC) $(MAINOBJ) $(OBJECTS) $(EXECUTABLE) 
 
-debug: CFLAGS += $(DEBUG)
+debug: CFLAGS = $(DEBUGFLAGS)
 debug: clean all
 
 experiments: CFLAGS += $(EXPERIMENTS)

@@ -24,7 +24,11 @@ public:
 	WaveletKdMatrix *get_log() {return this->log;};
 
 	uint get_changes() {return this->changes;}
-	size_t getSize() { /*return this->log->getSize() + this->time->getSize() + sizeof(TemporalGraphLog);*/ return 0;}
+	size_t getSize() { 
+    fprintf(stderr, "S size: %lu\n", this->log->getSize());
+    fprintf(stderr, "B size: %lu\n", this->time->getSize());
+    return this->log->getSize() + this->time->getSize() + sizeof(TemporalGraphLog);
+  }
 	size_t pos_time(size_t i) const;
 	
 	uint getMaxtime() { return maxtime;}
