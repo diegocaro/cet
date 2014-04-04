@@ -9,8 +9,14 @@ DEBUG = -g -DDEBUG
 
 EXPERIMENTS = -DEXPERIMENTS
 
+UNAME := $(shell uname)
+LDFLAGSRT = 
+ifeq ($(UNAME), Linux)
+LDFLAGSRT = -lrt
+endif
+
 CFLAGS=-c -Wall -I$(DEPEN_LIBCDS_INC) -I$(DEPEN_WT64) -O3
-LDFLAGS=-Wall $(DEPEN_LIBCDS) -lm
+LDFLAGS=-Wall $(DEPEN_LIBCDS) -lm $(LDFLAGSRT)
 
 EXT=
 
