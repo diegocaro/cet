@@ -4,7 +4,7 @@ DEPEN_LIBCDS=../libcds/lib/libcds.a
 DEPEN_WT64=../wtkdmatrix/
 DEPEN_WT64_OBJS=wavelet_kd_matrix.o symbols.o
 
-CC=g++
+#CC=g++
 DEBUGFLAGS =-c -Wall -I$(DEPEN_LIBCDS_INC) -I$(DEPEN_WT64) -O0 -g -DDEBUG
 
 EXPERIMENTS = -DEXPERIMENTS
@@ -43,7 +43,7 @@ experiments: clean all
 #	$(CC) $(LDFLAGS) $(OBJECTS) $(DEPENOBJS) -o $@
 
 .cpp.o:
-	$(CC) $(CFLAGS) $< -o $@
+	$(CXX) $(CFLAGS) $< -o $@
 
 clean: cleanobj cleanexe
 
@@ -54,14 +54,14 @@ cleanexe:
 	rm -f $(EXECUTABLE)
 
 create: create.o
-	$(CC) $(OBJECTS) $(DEPENOBJS) $< -o $@$(EXT) $(LDFLAGS)
+	$(CXX) $(OBJECTS) $(DEPENOBJS) $< -o $@$(EXT) $(LDFLAGS)
 
 use: use.o
-	$(CC) $(OBJECTS) $(DEPENOBJS) $< -o $@$(EXT) $(LDFLAGS)
+	$(CXX) $(OBJECTS) $(DEPENOBJS) $< -o $@$(EXT) $(LDFLAGS)
 
 benchmark: benchmark.o
-	$(CC) $(OBJECTS) $(DEPENOBJS) $< -o $@$(EXT) $(LDFLAGS)
+	$(CXX) $(OBJECTS) $(DEPENOBJS) $< -o $@$(EXT) $(LDFLAGS)
 
 
 exp-query: exp-query.o
-	$(CC) $(OBJECTS) $(DEPENOBJS) $< -o $@$(EXT) $(LDFLAGS)
+	$(CXX) $(OBJECTS) $(DEPENOBJS) $< -o $@$(EXT) $(LDFLAGS)
