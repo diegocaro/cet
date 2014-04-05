@@ -116,29 +116,29 @@ void read_contacts(struct adjlog *l) {
 		uint c_read = 0;
 
 		usym c;
-
+    uint changes = 0;
 		while( EOF != scanf("%u %u %u %u", &u, &v, &a, &b)) {
 			c_read++;
 			if(c_read%500000==0) fprintf(stderr, "Processing %.1f%%\r", (float)c_read/contacts*100);
 			c.x = u;
 			c.y = v;
 			btable[a].push_back(c);
-
+      changes++;
 			if (b == lifetime-1) continue;
-
+      changes++;
 			btable[b].push_back(c);
 		}
 		fprintf(stderr, "Processing %.1f%%\r", (float)c_read/contacts*100);
 		assert(c_read == contacts);
 
-		uint lenS = 2*contacts;
+//		uint changes = 2*contacts;
 
 		l->nodes = nodes;
-		l->changes= lenS;
+		l->changes= changes;
 		l->maxtime = lifetime;
 
-		l->size_log = lenS; //uppper bound
-		l->size_time = lifetime + lenS; // in bits, upper bound
+		l->size_log = changes; 
+		l->size_time = lifetime + changes; 
 		LOG("Nodes:\t%u", l->nodes);
 		LOG("Changes:\t%u", l->changes);
 		LOG("Maxtime:\t%u", l->maxtime);
@@ -155,16 +155,17 @@ void read_contacts(struct adjlog *l) {
 
 		uint p=0;
 
+
 		for(uint i=0; i < lifetime; i++) {
 
 			for (uint j=0; j < btable[i].size(); ++j) {
-				l->log[p].x = btable[i][j].x;
-				l->log[p].y = btable[i][j].y;
+        c = btable[i][j];
+				l->log[p] = btable[i][j];
 				p++;
 			}
 			bitset(l->time, i+p);
 		}
-
+    assert(p == changes);
 		//l->size_log = p; //actual size (could be less than lenS)
 		//l->size_time = lifetime + p; // in bits, actual value
 
