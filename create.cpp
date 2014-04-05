@@ -164,6 +164,8 @@ void read_contacts(struct adjlog *l) {
 				p++;
 			}
 			bitset(l->time, i+p);
+      
+      btable[i].clear();
 		}
     assert(p == changes);
 		//l->size_log = p; //actual size (could be less than lenS)
