@@ -1,3 +1,4 @@
+#include <cstring>
 #include "tgl.h"
 #include "arraysort.h"
 #include "mywtkdmatrix.h"
