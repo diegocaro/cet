@@ -5,6 +5,8 @@
 
 
 uint buffer[BUFFER];
+uint buffer2[BUFFER];
+
 
 TemporalGraphLog::TemporalGraphLog() {};
 
@@ -88,12 +90,14 @@ void TemporalGraphLog::direct_interval(uint node, uint tstart, uint tend, uint s
 	*buffer = 0;
 	((MyWaveletKdMatrix *)log)->axis<append_symbol>(sptime, eptime, 0U, node, buffer);
 	
-	*res = 0;
-	direct_point(node, tstart, res);
+	*buffer2 = 0;
+	direct_point(node, tstart, buffer2);
 
-	uint i,j;
+	//uint i,j;
+  //this semantic filter is O(d) where d is the out degree of the node
 	if (semantic == 0) { //semantic weak
-		j = *res;
+		/*
+    j = *res;
 		for (i = 1; i <= *buffer; i++) {
 			res[++j] = buffer[i];
 		}
@@ -102,11 +106,14 @@ void TemporalGraphLog::direct_interval(uint node, uint tstart, uint tend, uint s
 		qsort(&res[1], *res, sizeof(unsigned int), compare);
 
 		remove_duplicates(res);
+    */
+    merge_arraysort(res, buffer2, buffer);
 	}
 	else if (semantic == 1) { //semantic strong
 
 		//printf("direct neighbors: "); print_arraysort(buffer3);
-		diff_arraysort(res, buffer);
+		diff_arraysort(buffer2, buffer);
+    memcpy(res, buffer2, (*buffer2+1)*sizeof(uint));
 	}
 	
 }
@@ -138,13 +145,16 @@ void TemporalGraphLog::reverse_interval(uint node, uint tstart, uint tend, uint 
 	*buffer = 0;
 	((MyWaveletKdMatrix *)log)->axis<append_symbol>(sptime, eptime, 1U, node, buffer);
 
-	*res = 0;
-	reverse_point(node, tstart, res);
+	*buffer2 = 0;
+	reverse_point(node, tstart, buffer2);
 
-	uint j;
-	uint i;
+	//uint j;
+	//uint i;
+  
+  //this semantic filter is O(d) where d is the in degree of the node
 	if (semantic == 0) { //semantic weak
-		j = *res;
+		/*
+    j = *res;
 		for (i = 1; i <= *buffer; i++) {
 			res[++j] = buffer[i];
 		}
@@ -153,11 +163,14 @@ void TemporalGraphLog::reverse_interval(uint node, uint tstart, uint tend, uint 
 		qsort(&res[1], *res, sizeof(unsigned int), compare);
 
 		remove_duplicates(res);
+    */
+    merge_arraysort(res, buffer2, buffer);
 	}
 	else if (semantic == 1) { //semantic strong
 
 		//printf("direct neighbors: "); print_arraysort(buffer3);
-		diff_arraysort(res, buffer);
+		diff_arraysort(buffer2, buffer);
+    memcpy(res, buffer2, (*buffer2+1)*sizeof(uint));
 	}
 }
 
