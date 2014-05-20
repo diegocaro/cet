@@ -4,7 +4,6 @@
 #include <getopt.h>
 #include <cstring>
 
-#include <map>
 #include <vector>
 
 #include "debug.h"
@@ -38,6 +37,35 @@ struct opts {
 	enum bitseq bs; //bit data structure
 	char *outfile;
 };
+
+
+
+class Change {
+public:
+	uint u;
+	uint t;
+	uint v;
+	
+	Change() {
+		
+	}
+	
+	Change(const Change& rhs) {
+		u = rhs.u; v = rhs.v; t = rhs.t;
+	}
+	
+	bool operator<(const Change &rhs) const {
+		if (t<rhs.t) return true;
+		
+		if (t == rhs.t) {
+			if (u < rhs.u) return true;
+			if (u == rhs.u) return (v<rhs.v);
+		}
+		
+		return false;
+	}
+};
+
 
 
 // read temporal graph and populate adjlog
@@ -109,27 +137,33 @@ void read_contacts(struct adjlog *l) {
 	uint nodes, edges, lifetime, contacts;
 		uint u,v,a,b;
 
-		map<uint, vector<usym> > btable;
+		vector<Change> btable;
 
 		scanf("%u %u %u %u", &nodes, &edges, &lifetime, &contacts);
 
 		uint c_read = 0;
 
-		usym c;
-    uint changes = 0;
+		Change c;
+		uint changes = 0;
 		while( EOF != scanf("%u %u %u %u", &u, &v, &a, &b)) {
 			c_read++;
 			if(c_read%500000==0) fprintf(stderr, "Processing %.1f%%\r", (float)c_read/contacts*100);
-			c.x = u;
-			c.y = v;
-			btable[a].push_back(c);
-      changes++;
+			c.u = u;
+			c.v = v;
+			c.t = a;
+			btable.push_back(c);
+      	  	
+			changes++;
 			if (b == lifetime-1) continue;
-      changes++;
-			btable[b].push_back(c);
+			changes++;
+			c.t = b;
+			btable.push_back(c);
 		}
 		fprintf(stderr, "Processing %.1f%%\r", (float)c_read/contacts*100);
 		assert(c_read == contacts);
+
+		fprintf(stderr,"Sorting...\r");
+		sort (btable.begin(), btable.end());  
 
 //		uint changes = 2*contacts;
 
@@ -153,24 +187,32 @@ void read_contacts(struct adjlog *l) {
 		INFO("Memory acquiered");
 
 
+
+		vector<Change>::iterator it;
+		vector<Change>::iterator itlow;
+		Change vlow;
+		usym s;
+
 		uint p=0;
-
-
 		for(uint i=0; i < lifetime; i++) {
+			if(i%100==0) fprintf(stderr, "Copying %.1f%%\r", (float)i/lifetime*100);
+			vlow.u = 0;
+			vlow.v = 0;
+			vlow.t = i;
+			itlow = lower_bound(btable.begin(), btable.end(), vlow);
 
-			for (uint j=0; j < btable[i].size(); ++j) {
-        c = btable[i][j];
-				l->log[p] = btable[i][j];
+			for (it = itlow; it->t == i; ++it) {
+				s.x = it->u;
+				s.y = it->v;
+				l->log[p] = s;
 				p++;
 			}
 			bitset(l->time, i+p);
-      
-      btable[i].clear();
 		}
-    assert(p == changes);
+		assert(p == changes);
 		//l->size_log = p; //actual size (could be less than lenS)
 		//l->size_time = lifetime + p; // in bits, actual value
-
+		btable.clear();
 }
 
 void create_index(TemporalGraphLog &tgl, struct adjlog *adjlog, struct opts *opts) {

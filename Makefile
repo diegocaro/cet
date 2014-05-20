@@ -5,7 +5,7 @@ DEPEN_WT64=../wtkdmatrix/
 DEPEN_WT64_OBJS=wavelet_kd_matrix.o symbols.o
 
 #CC=g++
-DEBUGFLAGS =-c -Wall -I$(DEPEN_LIBCDS_INC) -I$(DEPEN_WT64) -O0 -g -DDEBUG
+DEBUGFLAGS =-c -Wall -I$(DEPEN_LIBCDS_INC) -I$(DEPEN_WT64) -O3 -g -DDEBUG
 
 EXPERIMENTS = -DEXPERIMENTS
 
