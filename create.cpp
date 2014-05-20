@@ -42,8 +42,8 @@ struct opts {
 
 class Change {
 public:
-	uint u;
 	uint t;
+	uint u;
 	uint v;
 	
 	Change() {
