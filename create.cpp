@@ -6,6 +6,7 @@
 
 #include <map>
 #include <vector>
+#include <algorithm>
 
 #include "debug.h"
 #include "symbols.h"
@@ -104,6 +105,12 @@ void read_stdin(struct adjlog *l) {
 	
 }
 
+bool usymsort(const usym &a, const usym &b) {
+    if (a.x < b.x) return true;
+    if (a.x == b.x) return (a.y < b.y);
+    return false;
+}
+
 // read temporal graph from contacts
 void read_contacts(struct adjlog *l) {
 	uint nodes, edges, lifetime, contacts;
@@ -157,9 +164,9 @@ void read_contacts(struct adjlog *l) {
 
 
 		for(uint i=0; i < lifetime; i++) {
-
+            sort (btable[i].begin(), btable[i].end(), usymsort);
 			for (uint j=0; j < btable[i].size(); ++j) {
-        c = btable[i][j];
+                c = btable[i][j];
 				l->log[p] = btable[i][j];
 				p++;
 			}
