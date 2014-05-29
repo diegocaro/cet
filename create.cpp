@@ -32,11 +32,12 @@ struct adjlog {
 
 
 enum bitseq {
-	RG, R3,
+	RG, R3, SD
 };
 
 struct opts {
-	enum bitseq bs; //bit data structure
+	enum bitseq bs; //bits for wavelet tree
+	enum bitseq bb; //bits for B bitmap
 	char *outfile;
 };
 
@@ -182,6 +183,7 @@ void read_contacts(struct adjlog *l) {
 
 void create_index(TemporalGraphLog &tgl, struct adjlog *adjlog, struct opts *opts) {
 	BitSequenceBuilder *bs;
+	BitSequenceBuilder *bb;
 	
 	tgl.set_nodes(adjlog->nodes);
 	tgl.set_changes(adjlog->changes);
@@ -194,11 +196,29 @@ void create_index(TemporalGraphLog &tgl, struct adjlog *adjlog, struct opts *opt
 		case R3:
 		bs = new BitSequenceBuilderRRR(32); // DEFAULT_SAMPLING for RRR is 32 
 		break;
+		case SD:
+		bs = new BitSequenceBuilderSDArray();
+		break;
 	}
+	
+	
+	switch(opts->bb) {
+		case RG:
+		bb = new BitSequenceBuilderRG(20); // by default, 5% of extra space for bitmaps
+		break;
+		case R3:
+		bb = new BitSequenceBuilderRRR(32); // DEFAULT_SAMPLING for RRR is 32 
+		break;
+		case SD:
+		bb = new BitSequenceBuilderSDArray();
+		break;
+	}
+	
+	
 	
 	tgl.set_log(adjlog->log, adjlog->size_log, bs);
 	
-	tgl.set_time(adjlog->time, adjlog->size_time, bs);
+	tgl.set_time(adjlog->time, adjlog->size_time, bb);
 	
 }
 
@@ -208,26 +228,48 @@ int readopts(int argc, char **argv, struct opts *opts) {
 	
 	// Default options
 	opts->bs = RG;
-
-	while ((o = getopt(argc, argv, "b:")) != -1) {
+	opts->bb = SD;
+	
+	while ((o = getopt(argc, argv, "b:t:")) != -1) {
 		switch (o) {
 			case 'b':
 			if(strcmp(optarg, "RG")==0) {
-				INFO("Using RG for bitmaps");
+				INFO("Using RG for wavelet matrix");
 				opts->bs = RG;
 			}
 			else if(strcmp(optarg, "RRR")==0) {
-				INFO("Using RRR for bitmaps");
+				INFO("Using RRR for wavelet matrix");
 				opts->bs = R3;
 			}
+			else if(strcmp(optarg, "SD")==0) {
+				INFO("Using SDarray for wavelet matrix");
+				opts->bs = SD;
+			}
 			break;
+			
+			case 't':
+			if(strcmp(optarg, "RG")==0) {
+				INFO("Using RG for bitmap B");
+				opts->bb = RG;
+			}
+			else if(strcmp(optarg, "RRR")==0) {
+				INFO("Using RRR for bitmap B");
+				opts->bb = R3;
+			}
+			else if(strcmp(optarg, "SD")==0) {
+				INFO("Using SDarray for bitmap B");
+				opts->bb = SD;
+			}
+			break;
+			
+			
 			default: /* '?' */
 			break;
 		}
 	}
 	
         if (optind >= argc || (argc-optind) < 1) {
-		fprintf(stderr, "%s [-b RG,RRR]<outputfile> \n", argv[0]);
+		fprintf(stderr, "%s [-b RG,RRR,SD] [-t RG,RRR,SD] <outputfile> \n", argv[0]);
 		fprintf(stderr, "Expected argument after options\n");
 		exit(EXIT_FAILURE);
         }
