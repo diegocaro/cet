@@ -35,10 +35,15 @@ enum bitseq {
 	RG, R3, SD
 };
 
+enum TypeGraph {
+	kInterval, kGrowth, kPoint
+};
+
 struct opts {
 	enum bitseq bs; //bits for wavelet tree
 	enum bitseq bb; //bits for B bitmap
 	char *outfile;
+   enum TypeGraph typegraph;
 };
 
 
@@ -113,7 +118,7 @@ bool usymsort(const usym &a, const usym &b) {
 }
 
 // read temporal graph from contacts
-void read_contacts(struct adjlog *l) {
+void read_contacts(struct opts &opts,struct adjlog *l) {
 	uint nodes, edges, lifetime, contacts;
 		uint u,v,a,b;
 
@@ -132,7 +137,14 @@ void read_contacts(struct adjlog *l) {
 			c.y = v;
 			btable[a].push_back(c);
       changes++;
+
+
+	if ( opts.typegraph == kGrowth || opts.typegraph == kPoint) {
 			if (b == lifetime-1) continue;
+		}		
+
+
+
       changes++;
 			btable[b].push_back(c);
 		}
@@ -228,9 +240,11 @@ int readopts(int argc, char **argv, struct opts *opts) {
 	
 	// Default options
 	opts->bs = RG;
-	opts->bb = SD;
+	opts->bb = RG;
 	
-	while ((o = getopt(argc, argv, "b:t:")) != -1) {
+	opts->typegraph = kInterval;
+
+	while ((o = getopt(argc, argv, "b:c:t:")) != -1) {
 		switch (o) {
 			case 'b':
 			if(strcmp(optarg, "RG")==0) {
@@ -247,7 +261,7 @@ int readopts(int argc, char **argv, struct opts *opts) {
 			}
 			break;
 			
-			case 't':
+			case 'c':
 			if(strcmp(optarg, "RG")==0) {
 				INFO("Using RG for bitmap B");
 				opts->bb = RG;
@@ -261,7 +275,20 @@ int readopts(int argc, char **argv, struct opts *opts) {
 				opts->bb = SD;
 			}
 			break;
-			
+		case 't':
+			if(strcmp(optarg, "I")==0) {
+				INFO("Interval-contact Temporal Graph");
+				opts->typegraph = kInterval;
+			}
+			else if(strcmp(optarg, "P")==0) {
+				INFO("Point-contact Temporal Graph");
+				opts->typegraph = kPoint;
+			}
+			else if(strcmp(optarg, "G")==0) {
+				INFO("Growing Temporal Graph");
+				opts->typegraph = kGrowth;
+			}
+			break;
 			
 			default: /* '?' */
 			break;
@@ -269,8 +296,13 @@ int readopts(int argc, char **argv, struct opts *opts) {
 	}
 	
         if (optind >= argc || (argc-optind) < 1) {
-		fprintf(stderr, "%s [-b RG,RRR,SD] [-t RG,RRR,SD] <outputfile> \n", argv[0]);
+		fprintf(stderr, "%s [-b RG,RRR,SD] [-c RG,RRR,SD] <outputfile> \n", argv[0]);
 		fprintf(stderr, "Expected argument after options\n");
+	fprintf(stderr, "Expected type of graph (-t):\n");
+			fprintf(stderr, "\tI for Interval-contact Temporal Graph\n");
+			fprintf(stderr, "\tP for Point-contact Temporal Graph\n");
+			fprintf(stderr, "\tG for Growing Temporal Graph\n\n");	
+
 		exit(EXIT_FAILURE);
         }
 	
@@ -292,7 +324,7 @@ int main(int argc, char *argv[]) {
 	
 	INFO("Loading graph...");
 	//read_stdin(&tg);
-	read_contacts(&tg);
+	read_contacts(opts,&tg);
 	
 	INFO("Creating index...");
 	create_index(tgl, &tg, &opts);
