@@ -8,9 +8,14 @@
 #include <vector>
 #include <algorithm>
 
+#include "btree_map.h"
+using namespace btree;
+
 #include "debug.h"
 #include "symbols.h"
 #include "tgl.h"
+
+
 
 struct infolog {
 	uint nodes;
@@ -122,7 +127,7 @@ void read_contacts(struct opts &opts,struct adjlog *l) {
 	uint nodes, edges, lifetime, contacts;
 		uint u,v,a,b;
 
-		map<uint, vector<usym> > btable;
+		btree_map<uint, vector<usym> > btable;
 
 		scanf("%u %u %u %u", &nodes, &edges, &lifetime, &contacts);
 

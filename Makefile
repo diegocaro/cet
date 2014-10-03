@@ -15,7 +15,7 @@ ifeq ($(UNAME), Linux)
 LDFLAGSRT = -lrt
 endif
 
-CFLAGS=-c -Wall -I$(DEPEN_LIBCDS_INC) -I$(DEPEN_WT64) -O3 
+CFLAGS=-c -Wall -I$(DEPEN_LIBCDS_INC) -I$(DEPEN_WT64) -O3 -std=c++0x
 LDFLAGS=-Wall $(DEPEN_LIBCDS) -lm $(LDFLAGSRT)
 
 EXT=
