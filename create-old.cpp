@@ -7,7 +7,8 @@
 #include <map>
 #include <vector>
 #include <algorithm>
-#include "btree_set.h"
+
+#include "btree_map.h"
 using namespace btree;
 
 #include "debug.h"
@@ -115,57 +116,31 @@ void read_stdin(struct adjlog *l) {
 	
 }
 
-
-
-
-class Change {
-public:
-	uint t;
-	uint u;
-	uint v;
-	
-	Change() {
-		
-	}
-	
-	Change(const Change& rhs) {
-		u = rhs.u; v = rhs.v; t = rhs.t;
-	}
-	
-	bool operator<(const Change &rhs) const {
-		if (t<rhs.t) return true;
-		
-		if (t == rhs.t) {
-			if (u<rhs.u) return true;
-			if (u == rhs.u) return (v<rhs.v);
-		}
-		
-		return false;
-	}
-};
-
-
+bool usymsort(const usym &a, const usym &b) {
+    if (a.x < b.x) return true;
+    if (a.x == b.x) return (a.y < b.y);
+    return false;
+}
 
 // read temporal graph from contacts
 void read_contacts(struct opts &opts,struct adjlog *l) {
 	uint nodes, edges, lifetime, contacts;
 		uint u,v,a,b;
 
-  	btree_set<Change> btable;
+		btree_map<uint, vector<usym> > btable;
 
 		scanf("%u %u %u %u", &nodes, &edges, &lifetime, &contacts);
 
 		uint c_read = 0;
 
-  	Change c;
+		usym c;
     uint changes = 0;
 		while( EOF != scanf("%u %u %u %u", &u, &v, &a, &b)) {
 			c_read++;
 			if(c_read%500000==0) fprintf(stderr, "Processing %.1f%%\r", (float)c_read/contacts*100);
-			c.u = u;
-			c.v = v;
-      c.t = a;
-			btable.insert(c);
+			c.x = u;
+			c.y = v;
+			btable[a].push_back(c);
       changes++;
 
 
@@ -173,11 +148,10 @@ void read_contacts(struct opts &opts,struct adjlog *l) {
 			if (b == lifetime-1) continue;
 		}		
 
-			c.u = u;
-			c.v = v;
-      c.t = b;
-			btable.insert(c);
+
+
       changes++;
+			btable[b].push_back(c);
 		}
 		fprintf(stderr, "Processing %.1f%%\r", (float)c_read/contacts*100);
 		assert(c_read == contacts);
@@ -201,37 +175,26 @@ void read_contacts(struct opts &opts,struct adjlog *l) {
 		l->time = (uint *) calloc((l->size_time/W + 1), sizeof(uint));
 		l->log = (usym *) malloc(l->size_log * sizeof(usym));
 
-		INFO("Memory acquired");
-    
-  	btree_set<Change>::iterator it;
-  	btree_set<Change>::iterator itlow;
-    Change vlow;
-    
-    usym s;
-    uint p=0;
+		INFO("Memory acquiered");
+
+
+		uint p=0;
+
+
 		for(uint i=0; i < lifetime; i++) {
-  		vlow.u = 0;
-  		vlow.v = 0;
-  		vlow.t = i;
-      
-  		itlow = btable.lower_bound(vlow);
-      
-  		for( it = itlow; it->t == i; ++it) {      
-        s.x = it->u;
-        s.y = it->v;
-        
-        l->log[p] = s;
-        
-        p++; 
-      }
-      
+            sort (btable[i].begin(), btable[i].end(), usymsort);
+			for (uint j=0; j < btable[i].size(); ++j) {
+                c = btable[i][j];
+				l->log[p] = btable[i][j];
+				p++;
+			}
 			cds_utils::bitset(l->time, i+p);
-    }
-    
+      
+      btable[i].clear();
+		}
     assert(p == changes);
 		//l->size_log = p; //actual size (could be less than lenS)
 		//l->size_time = lifetime + p; // in bits, actual value
-  	btable.clear();
 
 }
 
