@@ -7,8 +7,6 @@
 #include <map>
 #include <vector>
 #include <algorithm>
-#include "btree_set.h"
-using namespace btree;
 
 #include "debug.h"
 #include "symbols.h"
@@ -145,16 +143,28 @@ public:
 };
 
 
+bool cmpChange(const Change &lhs,const Change &rhs) {
+	if (lhs.t<rhs.t) return true;
+	
+	if (lhs.t == rhs.t) {
+		if (lhs.u<rhs.u) return true;
+		if (lhs.u == rhs.u) return (lhs.v<rhs.v);
+	}
+	
+	return false;
+}
+
 
 // read temporal graph from contacts
 void read_contacts(struct opts &opts,struct adjlog *l) {
 	uint nodes, edges, lifetime, contacts;
 		uint u,v,a,b;
 
-  	btree_set<Change> btable;
+  	vector<Change> btable;
 
 		scanf("%u %u %u %u", &nodes, &edges, &lifetime, &contacts);
 
+    btable.reserve(2*contacts);
 		uint c_read = 0;
 
   	Change c;
@@ -165,7 +175,7 @@ void read_contacts(struct opts &opts,struct adjlog *l) {
 			c.u = u;
 			c.v = v;
       c.t = a;
-			btable.insert(c);
+			btable.push_back(c);
       changes++;
 
 
@@ -173,14 +183,18 @@ void read_contacts(struct opts &opts,struct adjlog *l) {
 			if (b == lifetime-1) continue;
 		}		
 
-			c.u = u;
-			c.v = v;
-      c.t = b;
-			btable.insert(c);
+
+
       changes++;
+      c.t = b;
+			btable.push_back(c);
 		}
 		fprintf(stderr, "Processing %.1f%%\r", (float)c_read/contacts*100);
 		assert(c_read == contacts);
+
+    // shrink_to_fit old
+    //btable.resize(changes); 
+    btable.shrink_to_fit();
 
 //		uint changes = 2*contacts;
 
@@ -203,8 +217,11 @@ void read_contacts(struct opts &opts,struct adjlog *l) {
 
 		INFO("Memory acquired");
     
-  	btree_set<Change>::iterator it;
-  	btree_set<Change>::iterator itlow;
+    fprintf(stderr,"Sorting...\n");
+    sort(btable.begin(), btable.end(), cmpChange);
+    
+  	vector<Change>::iterator it;
+  	vector<Change>::iterator itlow;
     Change vlow;
     
     usym s;
@@ -214,7 +231,7 @@ void read_contacts(struct opts &opts,struct adjlog *l) {
   		vlow.v = 0;
   		vlow.t = i;
       
-  		itlow = btable.lower_bound(vlow);
+  		itlow = lower_bound (btable.begin(), btable.end(), vlow, cmpChange);
       
   		for( it = itlow; it->t == i; ++it) {      
         s.x = it->u;
