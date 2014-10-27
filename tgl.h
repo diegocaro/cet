@@ -50,6 +50,14 @@ public:
         
         int edge_next(uint u, uint v, uint t);
         
+
+    size_t change_point(uint t);
+    size_t change_interval(uint ts, uint te);
+    size_t actived_point(uint t);
+    size_t actived_interval(uint ts, uint te);
+    size_t deactived_point(uint t);
+    size_t deactived_interval(uint ts, uint te);
+
 protected:
 	
 	void direct_interval(uint node, uint tstart, uint tend, uint semantic, uint *res) const;

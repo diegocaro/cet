@@ -19,6 +19,22 @@ inline void append_symbol(uint symbol, uint freq, uint *res) {
 
 typedef void (*action)(uint, uint, uint*);
 
+
+inline void append_change(usym symbol, size_t start, size_t end, size_t &res) {
+    res += 1;
+    //printf("%u %u\n",symbol.x, symbol.y);
+}
+
+inline void append_actived(usym symbol, size_t start, size_t end, size_t &res) {
+    if (start %2 == 0) res += 1;
+}
+
+inline void append_deactived(usym symbol, size_t start, size_t end, size_t &res) {
+    if (start %2 == 1) res += 1;
+}
+
+typedef void (*filter)(usym, size_t, size_t, size_t &);
+
 class MyWaveletKdMatrix : public WaveletKdMatrix {
 public:
 	template<action F>
@@ -27,6 +43,9 @@ public:
 
 	void rankall(size_t start, size_t end, size_t &res);
 
+	template<filter F>
+	void range(size_t start, size_t end, size_t &res);
+
 
 protected:
 	template<action F>
@@ -34,6 +53,9 @@ protected:
 
 
 	void _rankall(size_t start, size_t end, usym symbol, uint level, size_t &res);
+
+	template<filter F>
+	void _range(size_t start, size_t end, usym symbol, uint level, size_t &res);
 };
 
 #endif /* MYWAVELETKDMATRIX_H_ */

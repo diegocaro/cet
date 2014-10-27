@@ -63,6 +63,10 @@ size_t TemporalGraphLog::pos_time(size_t i) const {
 //	return b->select1(i+1) - i; 	//in the paper this operation is
                                   //start(i) = select1(b, i) - i + 1
 
+    if (i == (uint)(-1)) {
+        return 0;
+    }
+
   uint ret = time->select1(i+1);
   //printf("ret: %u\n", ret);
   if (ret == (uint)(-1)) {
@@ -269,4 +273,65 @@ int TemporalGraphLog::edge_next(uint u, uint v, uint t) {
         }
         
         return -1;
+}
+
+size_t TemporalGraphLog::change_point(uint t) {
+    return change_interval(t,t+1);
+}
+
+size_t TemporalGraphLog::change_interval(uint ts, uint te) {
+    size_t stime, etime;
+    stime = pos_time(ts-1);
+    etime = pos_time(te-1);
+
+    //printf("stime(%u): %lu\n", ts, stime);
+    //printf("etime(%u): %lu\n", te, etime);
+
+    size_t edges=0;
+
+    ((MyWaveletKdMatrix *)log)->range<append_change>(stime, etime, edges);
+
+
+    return edges;
+}
+
+
+size_t TemporalGraphLog::actived_point(uint t) {
+    return actived_interval(t,t+1);
+}
+
+size_t TemporalGraphLog::actived_interval(uint ts, uint te) {
+    size_t stime, etime;
+    stime = pos_time(ts-1);
+    etime = pos_time(te-1);
+
+    //printf("stime(%u): %lu\n", ts, stime);
+    //printf("etime(%u): %lu\n", te, etime);
+
+    size_t edges=0;
+
+    ((MyWaveletKdMatrix *)log)->range<append_actived>(stime, etime, edges);
+
+
+    return edges;
+}
+
+size_t TemporalGraphLog::deactived_point(uint t) {
+    return actived_interval(t,t+1);
+}
+
+size_t TemporalGraphLog::deactived_interval(uint ts, uint te) {
+    size_t stime, etime;
+    stime = pos_time(ts-1);
+    etime = pos_time(te-1);
+
+    //printf("stime(%u): %lu\n", ts, stime);
+    //printf("etime(%u): %lu\n", te, etime);
+
+    size_t edges=0;
+
+    ((MyWaveletKdMatrix *)log)->range<append_deactived>(stime, etime, edges);
+
+
+    return edges;
 }
