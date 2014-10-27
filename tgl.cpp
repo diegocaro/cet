@@ -317,7 +317,7 @@ size_t TemporalGraphLog::actived_interval(uint ts, uint te) {
 }
 
 size_t TemporalGraphLog::deactived_point(uint t) {
-    return actived_interval(t,t+1);
+    return deactived_interval(t,t+1);
 }
 
 size_t TemporalGraphLog::deactived_interval(uint ts, uint te) {
