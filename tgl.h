@@ -6,6 +6,10 @@
 
 #define BUFFER 1024*1024*10
 
+enum TypeGraph {
+    kInterval, kGrowth, kPoint
+};
+
 class TemporalGraphLog {
 public:
 	TemporalGraphLog();
@@ -17,6 +21,7 @@ public:
 	void set_nodes(uint nodes);
 	void set_changes(uint changes);
 	void set_maxtime(uint maxtime);
+	void set_typegraph(TypeGraph typeg){typegraph_ = typeg;}
 	
 	void save(ofstream &fp);
 	static TemporalGraphLog* load(ifstream &fp);
@@ -65,6 +70,21 @@ protected:
 	
         int edge_interval(uint u, uint v, uint tstart, uint tend, uint semantic);
         
+
+
+        // point contact graphs
+        void direct_interval_pg(uint node, uint tstart, uint tend, uint *res) const;
+        void reverse_interval_pg(uint node, uint tstart, uint tend, uint *res) const;
+        int edge_interval_pg(uint u, uint v, uint tstart, uint tend) const;
+        int edge_next_pg(uint u, uint v, uint t);
+
+        size_t snapshot_pg(uint t) const;
+
+        //size_t change_interval_pg(uint ts, uint te); //do not need an upgrade
+
+        size_t actived_interval_pg(uint ts, uint te);
+        size_t deactived_interval_pg(uint ts, uint te);
+
         uint nodes;
         uint changes;
         uint maxtime;
@@ -74,7 +94,7 @@ protected:
         size_t size_log;
         size_t size_time;
 		
-		
+		TypeGraph typegraph_;
 		
 		
 		

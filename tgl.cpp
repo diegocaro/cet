@@ -78,6 +78,11 @@ size_t TemporalGraphLog::pos_time(size_t i) const {
 }
 
 void TemporalGraphLog::direct_point(uint node, uint t, uint *res) const {
+    if (typegraph_ == kPoint) {
+        direct_interval_pg(node,t,t+1,res);
+        return;
+    }
+
 	size_t ptime;
 	ptime = pos_time(t);
 
@@ -124,15 +129,32 @@ void TemporalGraphLog::direct_interval(uint node, uint tstart, uint tend, uint s
 }
 
 void TemporalGraphLog::direct_weak(uint node, uint tstart, uint tend, uint *res) const {
+    if (typegraph_ == kPoint) {
+        direct_interval_pg(node,tstart,tend,res);
+        return;
+    }
+
 	direct_interval(node, tstart, tend, 0, res);
 }
 
 void TemporalGraphLog::direct_strong(uint node, uint tstart, uint tend, uint *res) const {
+    if (typegraph_ == kPoint) {
+        if (tend == tstart+1) {
+            direct_interval_pg(node,tstart,tend,res);
+        }
+        return;
+    }
+
 	direct_interval(node, tstart, tend, 1, res);
 }
 
 
 void TemporalGraphLog::reverse_point(uint node, uint t, uint *res) const {
+    if (typegraph_ == kPoint) {
+        reverse_interval_pg(node,t,t+1,res);
+        return;
+    }
+
 	size_t ptime;
 	ptime = pos_time(t);
 	
@@ -180,15 +202,31 @@ void TemporalGraphLog::reverse_interval(uint node, uint tstart, uint tend, uint 
 }
 
 void TemporalGraphLog::reverse_weak(uint node, uint tstart, uint tend, uint *res) const {
+    if (typegraph_ == kPoint) {
+        reverse_interval_pg(node,tstart,tend,res);
+        return;
+    }
+
 	reverse_interval(node, tstart, tend, 0, res);
 }
 
 void TemporalGraphLog::reverse_strong(uint node, uint tstart, uint tend, uint *res) const {
+    if (typegraph_ == kPoint) {
+        if (tend == tstart+1) {
+            reverse_interval_pg(node,tstart,tend,res);
+        }
+        return;
+    }
+
 	reverse_interval(node, tstart, tend, 1, res);
 }
 
 
 size_t TemporalGraphLog::snapshot(uint t) const {
+    if (typegraph_ == kPoint) {
+        return snapshot_pg(t);
+    }
+
 	size_t etime;
 	etime = pos_time(t);
 	
@@ -202,6 +240,10 @@ size_t TemporalGraphLog::snapshot(uint t) const {
 
 
 int TemporalGraphLog::edge_point(uint u, uint v, uint t) {
+    if (typegraph_ == kPoint) {
+        return edge_interval_pg(u,v,t,t+1);
+       }
+
 	size_t ptime;
 	ptime = pos_time(t);
         
@@ -217,9 +259,10 @@ int TemporalGraphLog::edge_point(uint u, uint v, uint t) {
 
 int TemporalGraphLog::edge_interval(uint u, uint v, uint tstart, uint tend, uint semantic) {
 	size_t sptime;
-        size_t eptime;
-	sptime = pos_time(tstart);
-        eptime = pos_time(tend);
+    size_t eptime;
+
+    sptime = pos_time(tstart)-1;
+    eptime = pos_time(tend)-1;
         
         struct symbols s;
         s.x=u;
@@ -245,13 +288,27 @@ int TemporalGraphLog::edge_interval(uint u, uint v, uint tstart, uint tend, uint
 }
 
 int TemporalGraphLog::edge_weak(uint u, uint v, uint tstart, uint tend) {
+    if (typegraph_ == kPoint) {
+        return edge_interval_pg(u,v,tstart,tend);
+       }
         return edge_interval(u, v, tstart, tend, 0);
 }
 int TemporalGraphLog::edge_strong(uint u, uint v, uint tstart, uint tend){
+    if (typegraph_ == kPoint) {
+           if (tend == tstart+1) {
+               return edge_interval_pg(u,v,tstart,tend);
+           }
+           return 0;
+       }
+
         return edge_interval(u, v, tstart, tend, 1);
 }
 
 int TemporalGraphLog::edge_next(uint u, uint v, uint t) {
+    if (typegraph_ == kPoint) {
+            return edge_next_pg(u,v,t);
+           }
+
 	size_t ptime;
 	ptime = pos_time(t);
         
@@ -301,6 +358,10 @@ size_t TemporalGraphLog::actived_point(uint t) {
 }
 
 size_t TemporalGraphLog::actived_interval(uint ts, uint te) {
+    if (typegraph_ == kPoint) {
+        return actived_interval_pg(ts,te);
+    }
+
     size_t stime, etime;
     stime = pos_time(ts-1);
     etime = pos_time(te-1);
@@ -321,6 +382,10 @@ size_t TemporalGraphLog::deactived_point(uint t) {
 }
 
 size_t TemporalGraphLog::deactived_interval(uint ts, uint te) {
+    if (typegraph_ == kPoint) {
+        return deactived_interval_pg(ts,te);
+    }
+
     size_t stime, etime;
     stime = pos_time(ts-1);
     etime = pos_time(te-1);
@@ -335,3 +400,101 @@ size_t TemporalGraphLog::deactived_interval(uint ts, uint te) {
 
     return edges;
 }
+
+
+
+
+
+
+
+// point contact graphs
+void TemporalGraphLog::direct_interval_pg(uint node, uint tstart, uint tend, uint *res) const {
+    size_t sptime;
+    size_t eptime;
+    sptime = pos_time(tstart-1);
+    eptime = pos_time(tend-1);
+
+    ((MyWaveletKdMatrix *)log)->axis<append_symbol>(sptime, eptime, 0U, node, res);
+}
+
+void TemporalGraphLog::reverse_interval_pg(uint node, uint tstart, uint tend, uint *res) const {
+    size_t sptime;
+    size_t eptime;
+    sptime = pos_time(tstart-1);
+    eptime = pos_time(tend-1);
+
+    ((MyWaveletKdMatrix *)log)->axis<append_symbol>(sptime, eptime, 1U, node, res);
+}
+
+int TemporalGraphLog::edge_interval_pg(uint u, uint v, uint tstart, uint tend) const {
+    size_t sptime;
+    size_t eptime;
+    sptime = pos_time(tstart)-1;
+    eptime = pos_time(tend)-1;
+
+    struct symbols s;
+    s.x=u;
+    s.y=v;
+
+    uint rstart;
+    uint rend;
+
+    rstart = log->rank(s, sptime);
+    rend = log->rank(s, eptime);
+
+    if (rend > rstart)
+        return 1;
+
+    return 0;
+}
+size_t TemporalGraphLog::snapshot_pg(uint t) const {
+    size_t sptime;
+    size_t eptime;
+    sptime = pos_time(t-1);
+    eptime = pos_time(t);
+
+    size_t active_edges=0;
+
+    ((MyWaveletKdMatrix *)log)->rankall(sptime, eptime,active_edges);
+
+
+    return active_edges;
+}
+
+int TemporalGraphLog::edge_next_pg(uint u, uint v, uint t) {
+    size_t ptime;
+    size_t etime;
+    ptime = pos_time(t);
+    etime = pos_time(t+1);
+
+        struct symbols s;
+        s.x=u;
+        s.y=v;
+
+        uint rstart;
+        uint rend;
+
+        rstart = log->rank(s, ptime);
+        rend = log->rank(s, etime);
+
+        if (rend > rstart) {
+            return t;
+        }
+
+
+        uint l;
+        l = log->select(s, rend+1);
+        if ( l != log->n ) {
+                return time->rank1(l);
+        }
+
+        return -1;
+}
+
+size_t TemporalGraphLog::actived_interval_pg(uint ts, uint te) {
+    return change_interval(ts,te);
+}
+size_t TemporalGraphLog::deactived_interval_pg(uint ts, uint te) {
+    return change_interval(ts-1,te-1);
+}
+

@@ -37,9 +37,7 @@ enum bitseq {
 	RG, R3, SD
 };
 
-enum TypeGraph {
-	kInterval, kGrowth, kPoint
-};
+
 
 struct opts {
 	enum bitseq bs; //bits for wavelet tree
@@ -140,6 +138,12 @@ public:
 		
 		return false;
 	}
+
+    bool operator==(const Change &rhs) const {
+        if (t == rhs.t && v == rhs.v && u == rhs.u) return true;
+
+        return false;
+    }
 };
 
 
@@ -179,11 +183,9 @@ void read_contacts(struct opts &opts,struct adjlog *l) {
       changes++;
 
 
-	if ( opts.typegraph == kGrowth || opts.typegraph == kPoint) {
-			if (b == lifetime-1) continue;
-		}		
+      if (opts.typegraph == kPoint) continue;
 
-
+      if ( opts.typegraph == kGrowth && b == lifetime-1) continue;
 
       changes++;
       c.t = b;
@@ -241,7 +243,7 @@ void read_contacts(struct opts &opts,struct adjlog *l) {
         
         p++; 
       }
-      
+
 			cds_utils::bitset(l->time, i+p);
     }
     
@@ -259,6 +261,7 @@ void create_index(TemporalGraphLog &tgl, struct adjlog *adjlog, struct opts *opt
 	tgl.set_nodes(adjlog->nodes);
 	tgl.set_changes(adjlog->changes);
 	tgl.set_maxtime(adjlog->maxtime);
+	tgl.set_typegraph(opts->typegraph);
 	
 	switch(opts->bs) {
 		case RG:
