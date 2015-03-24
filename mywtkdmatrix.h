@@ -26,11 +26,11 @@ inline void append_change(usym symbol, size_t start, size_t end, size_t &res) {
 }
 
 inline void append_actived(usym symbol, size_t start, size_t end, size_t &res) {
-    if (start %2 == 0) res += 1;
+    if (start %2 == 0 || (end-start)>1) res += 1;
 }
 
 inline void append_deactived(usym symbol, size_t start, size_t end, size_t &res) {
-    if (start %2 == 1) res += 1;
+    if (start %2 == 1  || (end-start)>1) res += 1;
 }
 
 typedef void (*filter)(usym, size_t, size_t, size_t &);
