@@ -197,6 +197,7 @@ int main(int argc, char ** argv) {
                case EDGE_WEAK: {
                        //gotres = findEdgeInterval(tree, query.row, query.column, query.initime, query.endtime, 0);
                        gotres = index->edge_weak(query.row, query.column, query.initime, query.endtime);
+                       *gotreslist = gotres;
 
                        break;
                }

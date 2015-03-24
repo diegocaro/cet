@@ -255,12 +255,12 @@ void MyWaveletKdMatrix::range(size_t start, size_t end, size_t &res) {
     usym a = {0,0};
 
     //_range(start, end, lowvoc, uppvoc, 0, 0, 1u << height/2, 1u << height/2 , 0, res);
-    _range<F>(start, end, a, 0, res);
+    _range<F>(start, end, a, 0, 0, res);
 }
 
 template<filter F>
-void MyWaveletKdMatrix::_range(size_t start, size_t end, usym symbol, uint level, size_t &res) {
-
+void MyWaveletKdMatrix::_range(size_t start, size_t end, usym symbol, uint level, size_t p, size_t &res) {
+  // the "p" value will give us the position of the current node in the bitmap
 
 //  printf("level: %u\n", level);
     if (start >= end) {
@@ -269,34 +269,43 @@ void MyWaveletKdMatrix::_range(size_t start, size_t end, usym symbol, uint level
     }
 
     if (height == level) {
-        F(symbol, start, end, res);
+      //printf("start-p: %lu\n",start-p);
+      //printf("end-start: %lu\n",end-start);
+        F(symbol, start-p, end-p, res);
         return;
     }
 
     size_t s0,e0,s1,e1;
-
+    
     s1 = bitmap[level]->rank1(start-1);
     e1 = bitmap[level]->rank1(end-1);
+
+    size_t p0,p1;
+
+    p1 = bitmap[level]->rank1(p-1);
+    p0 = p - p1;
 
     //printf("s1: %u\ne1: %u\n", s1,e1);
 
     s0 = start - s1;
     e0 = end - e1;
-//  printf("s0: %u\ne0: %u\n", s0,e0);
+
+    //printf("s0: %u\ne0: %u\n", s0,e0);
+    //printf("p0: %lu\np1: %lu\n",p0,p1);
 
     if (level%2 == 0) {
         // value for x :)
 
-        _range<F>(s0, e0, symbol, level+1, res);
+      _range<F>(s0, e0, symbol, level+1, p0, res);
 
-        symbol.x = symbol.x | (1 << (height/2-level/2-1));
-        _range<F>(s1 + Z[level], e1 + Z[level], symbol, level+1, res);
+      symbol.x = symbol.x | (1 << (height/2-level/2-1));
+      _range<F>(s1 + Z[level], e1 + Z[level], symbol, level+1, p1 + Z[level], res);
     }
     else {
-        _range<F>(s0, e0,  symbol, level+1, res);
+      _range<F>(s0, e0,  symbol, level+1, p0, res);
 
-        symbol.y = symbol.y | (1 << (height/2-level/2-1));
-        _range<F>(s1 + Z[level], e1 + Z[level], symbol, level+1, res);
+      symbol.y = symbol.y | (1 << (height/2-level/2-1));
+      _range<F>(s1 + Z[level], e1 + Z[level], symbol, level+1, p1 + Z[level], res);
     }
 
 }

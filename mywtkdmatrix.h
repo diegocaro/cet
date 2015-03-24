@@ -55,7 +55,7 @@ protected:
 	void _rankall(size_t start, size_t end, usym symbol, uint level, size_t &res);
 
 	template<filter F>
-	void _range(size_t start, size_t end, usym symbol, uint level, size_t &res);
+	  void _range(size_t start, size_t end, usym symbol, uint level, size_t p,size_t &res);
 };
 
 #endif /* MYWAVELETKDMATRIX_H_ */

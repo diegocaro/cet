@@ -368,7 +368,7 @@ size_t TemporalGraphLog::actived_interval(uint ts, uint te) {
 
     //printf("stime(%u): %lu\n", ts, stime);
     //printf("etime(%u): %lu\n", te, etime);
-
+	
     size_t edges=0;
 
     ((MyWaveletKdMatrix *)log)->range<append_actived>(stime, etime, edges);
