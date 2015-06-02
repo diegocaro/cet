@@ -1,5 +1,5 @@
 DEPEN_LIBCDS_INC=../libcds/includes/
-DEPEN_LIBCDS=../libcds/lib/libcds.a
+DEPEN_LIBCDS=../libcds/libcds.a
 
 DEPEN_WT64=../wtkdmatrix/
 DEPEN_WT64_OBJS=wavelet_kd_matrix.o symbols.o
