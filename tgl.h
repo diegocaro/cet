@@ -23,6 +23,8 @@ public:
 	void set_maxtime(uint maxtime);
 	void set_typegraph(TypeGraph typeg){typegraph_ = typeg;}
 	
+	uint get_nodes();
+	
 	void save(ofstream &fp);
 	static TemporalGraphLog* load(ifstream &fp);
 	

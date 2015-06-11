@@ -21,6 +21,7 @@ void TemporalGraphLog::set_nodes(uint nodes) {this->nodes = nodes;}
 void TemporalGraphLog::set_changes(uint changes) {this->changes = changes;}
 void TemporalGraphLog::set_maxtime(uint maxtime) {this->maxtime = maxtime;}
 
+uint TemporalGraphLog::get_nodes() {return nodes;}
 
 void TemporalGraphLog::set_log(usym *log, size_t size_log, BitSequenceBuilder *bs) {
 	this->size_log = size_log;
