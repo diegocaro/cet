@@ -76,7 +76,7 @@ int main(int argc, char ** argv) {
 
 	gotreslist = (uint*) malloc(sizeof(unsigned int) * BUFFER);
 
-	unsigned vertices = index->getNodes();
+	unsigned vertices = index->get_nodes();
 	for (unsigned v = 0; v <vertices; v++) {
 		if (v % 1000 == 0)
 			fprintf(stderr, "Progress: %.2f%%\r",
